@@ -26,7 +26,7 @@ jobs:
 
       # Step 3: Navigate to the project directory
       - name: Change to project directory
-        run: cd Ecommerce # Replace 'Ecommerce' with the correct subdirectory if needed
+        run: cd backend # Replace 'Ecommerce' with the correct subdirectory if needed
 
       # Step 4: Install dependencies
       - name: Install dependencies
