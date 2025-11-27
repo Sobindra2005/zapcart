@@ -1,5 +1,6 @@
 import app from './app';
 import config, { validateEnv } from '@/config/env';
+import { connectDatabase, disconnectDatabase } from './config/database';
 
 /**
  * Handle uncaught exceptions
@@ -20,7 +21,9 @@ validateEnv();
 /**
  * Start the server
  */
-const server = app.listen(config.port, () => {
+const server = app.listen(config.port, async () => {
+    await connectDatabase()
+
     console.log('\n🎉 Server started successfully!');
     console.log(`📡 Listening on port: ${config.port}`);
     console.log(`🌍 Environment: ${config.nodeEnv}`);
@@ -32,11 +35,11 @@ const server = app.listen(config.port, () => {
 /**
  * Handle unhandled promise rejections
  */
-process.on('unhandledRejection', (err: Error) => {
+process.on('unhandledRejection', async (err: Error) => {
     console.error('💥 UNHANDLED REJECTION! Shutting down gracefully...');
     console.error('Error name:', err.name);
     console.error('Error message:', err.message);
-
+    await disconnectDatabase();
     // Close server gracefully
     server.close(() => {
         console.log('🔴 Server closed');
@@ -49,6 +52,7 @@ process.on('unhandledRejection', (err: Error) => {
  */
 process.on('SIGTERM', () => {
     console.log('👋 SIGTERM received. Shutting down gracefully...');
+    disconnectDatabase()
     server.close(() => {
         console.log('🔴 Process terminated');
     });
@@ -58,6 +62,7 @@ process.on('SIGTERM', () => {
  * Handle graceful shutdown on SIGINT (Ctrl+C)
  */
 process.on('SIGINT', () => {
+    disconnectDatabase()
     console.log('\n👋 SIGINT received. Shutting down gracefully...');
     server.close(() => {
         console.log('🔴 Server closed');

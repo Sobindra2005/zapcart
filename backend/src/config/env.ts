@@ -52,7 +52,7 @@ export const config = {
 
     // Database configuration
     databaseUrl: getEnvVariable('DATABASE_URL', 'mongodb://localhost:27017/ecommerce'),
-
+    MONGODB_URL: getEnvVariable('MONGODB_URL', 'mongodb://localhost:27017/ecommerce'),
     // API configuration
     apiVersion: 'v1',
 
@@ -70,7 +70,7 @@ export const validateEnv = (): void => {
         console.log('🔍 Validating environment variables...');
 
         // This will throw if any required variable is missing
-        const requiredVars = ['PORT', 'NODE_ENV', 'DATABASE_URL'];
+        const requiredVars = ['PORT', 'NODE_ENV', 'DATABASE_URL', 'MONGODB_URL'];
 
         requiredVars.forEach(key => {
             getEnvVariable(key);
