@@ -58,7 +58,7 @@ if (config.nodeEnv === 'development') {
 app.get('/health', (_req: Request, res: Response) => {
     res.status(200).json({
         status: 'success',
-        message: 'Server is running',
+        message: 'Server is running perfectly ',
         environment: config.nodeEnv,
         timestamp: new Date().toISOString(),
     });
