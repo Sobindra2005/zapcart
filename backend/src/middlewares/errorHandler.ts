@@ -1,13 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClientKnownRequestError ,PrismaClientValidationError,PrismaClientInitializationError,PrismaClientRustPanicError } from "@prisma/client/runtime/client"
+import { PrismaClientKnownRequestError, PrismaClientValidationError, PrismaClientInitializationError, PrismaClientRustPanicError } from "@prisma/client/runtime/client"
 
 import AppError from '@/utils/AppError';
 import config from '@/config/env';
 
 /**
+ * MongoDB Cast Error interface
+ */
+interface MongoError {
+  path: string;
+  value: string;
+  code?: number;
+  errmsg?: string;
+  name?: string;
+  errors?: Record<string, { message: string }>;
+}
+
+/**
  * Handles CastError from MongoDB (invalid ObjectId format)
  */
-const handleCastError = (err: any): AppError => {
+const handleCastError = (err: MongoError): AppError => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
@@ -15,7 +27,7 @@ const handleCastError = (err: any): AppError => {
 /**
  * Handles duplicate field errors from MongoDB
  */
-const handleDuplicateFieldsError = (err: any): AppError => {
+const handleDuplicateFieldsError = (err: MongoError): AppError => {
   const value = err.errmsg?.match(/(["'])(\\?.)*?\1/)?.[0];
   const message = `Duplicate field value: ${value}. Please use another value`;
   return new AppError(message, 400);
@@ -24,8 +36,8 @@ const handleDuplicateFieldsError = (err: any): AppError => {
 /**
  * Handles validation errors from MongoDB/Mongoose
  */
-const handleValidationError = (err: any): AppError => {
-  const errors = Object.values(err.errors).map((el: any) => el.message);
+const handleValidationError = (err: MongoError): AppError => {
+  const errors = Object.values(err.errors || {}).map((el) => el.message);
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
@@ -43,7 +55,7 @@ const handlePrismaUniqueConstraintError = (err: PrismaClientKnownRequestError): 
 /**
  * Handles Prisma record not found error (P2025)
  */
-const handlePrismaNotFoundError = (_err: PrismaClientKnownRequestError): AppError => {
+const handlePrismaNotFoundError = (): AppError => {
   const message = 'Record not found or operation failed';
   return new AppError(message, 404);
 };
@@ -76,13 +88,13 @@ const handlePrismaConnectionError = (): AppError => {
 /**
  * Handles all Prisma errors based on error code
  */
-const handlePrismaError = (err: any): AppError => {
+const handlePrismaError = (err: unknown): AppError => {
   if (err instanceof PrismaClientKnownRequestError) {
     switch (err.code) {
       case 'P2002': // Unique constraint violation
         return handlePrismaUniqueConstraintError(err);
       case 'P2025': // Record not found
-        return handlePrismaNotFoundError(err);
+        return handlePrismaNotFoundError();
       case 'P2003': // Foreign key constraint failed
         return handlePrismaForeignKeyError(err);
       case 'P2000': // Value too long
@@ -101,8 +113,8 @@ const handlePrismaError = (err: any): AppError => {
     return new AppError('Invalid data provided', 400);
   }
 
-  if (err instanceof PrismaClientInitializationError || 
-      err instanceof PrismaClientRustPanicError) {
+  if (err instanceof PrismaClientInitializationError ||
+    err instanceof PrismaClientRustPanicError) {
     return handlePrismaConnectionError();
   }
 
@@ -139,7 +151,7 @@ const sendErrorProd = (err: AppError, res: Response): void => {
       status: err.status || 'error',
       message: err.message,
     });
-  } 
+  }
   // Programming or unknown error: don't leak error details
   else {
     // Log error for debugging
@@ -160,49 +172,53 @@ const sendErrorProd = (err: AppError, res: Response): void => {
  * Provides different responses for development and production
  */
 const errorHandler = (
-  err: any,
+  err: Error & Partial<AppError> & Partial<MongoError>,
   _req: Request,
   res: Response,
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void => {
-  // Set default values
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
+  const error = {
+    ...err,
+    statusCode: (err as AppError).statusCode || 500,
+    status: (err as AppError).status || 'error',
+    isOperational: (err as AppError).isOperational
+  } as Error & AppError & MongoError;
 
   // Log all errors in development
   if (config.nodeEnv === 'development') {
     console.error('❌ Error occurred:');
-    console.error('Message:', err.message);
-    console.error('Status Code:', err.statusCode);
-    console.error('Stack:', err.stack);
+    console.error('Message:', error.message);
+    console.error('Status Code:', error.statusCode);
+    console.error('Stack:', error.stack);
   } else {
     // In production, only log programming errors
-    if (!err.isOperational) {
-      console.error('❌ PROGRAMMING ERROR:', err);
+    if (!error.isOperational) {
+      console.error('❌ PROGRAMMING ERROR:', error);
     }
   }
 
   // Handle errors based on environment
   if (config.nodeEnv === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(error as AppError, res);
   } else {
-    let error = { ...err };
-    error.message = err.message;
+    let processedError: AppError | (Error & AppError & MongoError) = { ...error };
+    processedError.message = error.message;
 
     // Handle MongoDB/Mongoose errors
-    if (err.name === 'CastError') error = handleCastError(error);
-    if (err.code === 11000) error = handleDuplicateFieldsError(error);
-    if (err.name === 'ValidationError') error = handleValidationError(error);
+    if (error.name === 'CastError') processedError = handleCastError(processedError as MongoError);
+    if (error.code === 11000) processedError = handleDuplicateFieldsError(processedError as MongoError);
+    if (error.name === 'ValidationError') processedError = handleValidationError(processedError as MongoError);
 
     // Handle Prisma errors
     if (err instanceof PrismaClientKnownRequestError ||
-        err instanceof PrismaClientValidationError ||
-        err instanceof PrismaClientInitializationError ||
-        err instanceof PrismaClientRustPanicError) {
-      error = handlePrismaError(err);
+      err instanceof PrismaClientValidationError ||
+      err instanceof PrismaClientInitializationError ||
+      err instanceof PrismaClientRustPanicError) {
+      processedError = handlePrismaError(err);
     }
 
-    sendErrorProd(error, res);
+    sendErrorProd(processedError as AppError, res);
   }
 };
 
