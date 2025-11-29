@@ -6,6 +6,7 @@ import config from '@/config/env';
 import routes from '@/routes/index';
 import errorHandler from '@/middlewares/errorHandler';
 import AppError from '@/utils/AppError';
+import './workers/searchIndexWork.ts'
 
 const app = express();
 
