@@ -53,6 +53,11 @@ export const config = {
     // Database configuration
     databaseUrl: getEnvVariable('DATABASE_URL', 'mongodb://localhost:27017/ecommerce'),
     MONGODB_URL: getEnvVariable('MONGODB_URL', 'mongodb://localhost:27017/ecommerce'),
+
+    //redis configuration
+    redisHost: getEnvVariable('REDIS_HOST', '127.0.0.1'),
+    redisPort: parseInt(getEnvVariable('REDIS_PORT', '6379'), 10),
+
     // API configuration
     apiVersion: 'v1',
 
@@ -70,7 +75,7 @@ export const validateEnv = (): void => {
         console.log('🔍 Validating environment variables...');
 
         // This will throw if any required variable is missing
-        const requiredVars = ['PORT', 'NODE_ENV', 'DATABASE_URL', 'MONGODB_URL'];
+        const requiredVars = ['PORT', 'NODE_ENV', 'DATABASE_URL', 'MONGODB_URL','redisHost','redisPort'];
 
         requiredVars.forEach(key => {
             getEnvVariable(key);
