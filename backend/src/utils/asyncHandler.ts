@@ -7,7 +7,7 @@ type AsyncRequestHandler = (
     req: Request,
     res: Response,
     next: NextFunction
-) => Promise<any>;
+) => Promise<void>;
 
 /**
  * Wrapper function for async route handlers

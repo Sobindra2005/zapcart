@@ -46,12 +46,11 @@ jobs:
 
       - name: Build Backend Docker image
         run: |
-          docker build -t ecommerce-backend:dev ./backend
+          docker build -t ZapCart-backend:dev ./backend
 
       - name: Build Nginx Docker image
         run: |
-          docker build -t ecommerce-nginx:dev ./nginx
-
+          docker build -t ZapCart-nginx:dev ./nginx
       - name: Test Docker Compose
         run: |
           docker-compose up -d
