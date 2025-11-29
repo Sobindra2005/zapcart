@@ -50,9 +50,9 @@ process.on('unhandledRejection', async (err: Error) => {
 /**
  * Handle graceful shutdown on SIGTERM
  */
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
     console.log('👋 SIGTERM received. Shutting down gracefully...');
-    disconnectDatabase()
+    await disconnectDatabase();
     server.close(() => {
         console.log('🔴 Process terminated');
     });

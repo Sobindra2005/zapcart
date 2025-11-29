@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import { PrismaClientKnownRequestError ,PrismaClientValidationError,PrismaClientInitializationError,PrismaClientRustPanicError } from "@prisma/client/runtime/client"
+
 import AppError from '@/utils/AppError';
 import config from '@/config/env';
 
@@ -26,6 +28,86 @@ const handleValidationError = (err: any): AppError => {
   const errors = Object.values(err.errors).map((el: any) => el.message);
   const message = `Invalid input data. ${errors.join('. ')}`;
   return new AppError(message, 400);
+};
+
+/**
+ * Handles Prisma unique constraint violation (P2002)
+ */
+const handlePrismaUniqueConstraintError = (err: PrismaClientKnownRequestError): AppError => {
+  const target = err.meta?.target as string[] | undefined;
+  const fields = target?.join(', ') || 'field';
+  const message = `Duplicate value for ${fields}. Please use another value.`;
+  return new AppError(message, 400);
+};
+
+/**
+ * Handles Prisma record not found error (P2025)
+ */
+const handlePrismaNotFoundError = (_err: PrismaClientKnownRequestError): AppError => {
+  const message = 'Record not found or operation failed';
+  return new AppError(message, 404);
+};
+
+/**
+ * Handles Prisma foreign key constraint error (P2003)
+ */
+const handlePrismaForeignKeyError = (err: PrismaClientKnownRequestError): AppError => {
+  const field = err.meta?.field_name as string | undefined;
+  const message = `Invalid reference: ${field || 'foreign key constraint failed'}`;
+  return new AppError(message, 400);
+};
+
+/**
+ * Handles Prisma validation errors (P2000, P2001, etc.)
+ */
+const handlePrismaValidationError = (err: PrismaClientKnownRequestError): AppError => {
+  const message = err.message || 'Validation failed';
+  return new AppError(message, 400);
+};
+
+/**
+ * Handles Prisma connection errors
+ */
+const handlePrismaConnectionError = (): AppError => {
+  const message = 'Database connection failed. Please try again later.';
+  return new AppError(message, 503);
+};
+
+/**
+ * Handles all Prisma errors based on error code
+ */
+const handlePrismaError = (err: any): AppError => {
+  if (err instanceof PrismaClientKnownRequestError) {
+    switch (err.code) {
+      case 'P2002': // Unique constraint violation
+        return handlePrismaUniqueConstraintError(err);
+      case 'P2025': // Record not found
+        return handlePrismaNotFoundError(err);
+      case 'P2003': // Foreign key constraint failed
+        return handlePrismaForeignKeyError(err);
+      case 'P2000': // Value too long
+      case 'P2001': // Record not found
+      case 'P2011': // Null constraint violation
+      case 'P2012': // Missing required value
+      case 'P2013': // Missing required argument
+      case 'P2014': // Relation violation
+        return handlePrismaValidationError(err);
+      default:
+        return new AppError(err.message, 400);
+    }
+  }
+
+  if (err instanceof PrismaClientValidationError) {
+    return new AppError('Invalid data provided', 400);
+  }
+
+  if (err instanceof PrismaClientInitializationError || 
+      err instanceof PrismaClientRustPanicError) {
+    return handlePrismaConnectionError();
+  }
+
+  // Generic Prisma error
+  return new AppError('Database operation failed', 500);
 };
 
 /**
@@ -107,10 +189,18 @@ const errorHandler = (
     let error = { ...err };
     error.message = err.message;
 
-    // Handle specific error types
+    // Handle MongoDB/Mongoose errors
     if (err.name === 'CastError') error = handleCastError(error);
     if (err.code === 11000) error = handleDuplicateFieldsError(error);
     if (err.name === 'ValidationError') error = handleValidationError(error);
+
+    // Handle Prisma errors
+    if (err instanceof PrismaClientKnownRequestError ||
+        err instanceof PrismaClientValidationError ||
+        err instanceof PrismaClientInitializationError ||
+        err instanceof PrismaClientRustPanicError) {
+      error = handlePrismaError(err);
+    }
 
     sendErrorProd(error, res);
   }
