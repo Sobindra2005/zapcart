@@ -132,8 +132,6 @@ const sendErrorDev = (err: AppError, res: Response): void => {
     status: err.status || 'error',
     message: err.message,
     statusCode,
-    stack: err.stack,
-    error: err,
   });
 };
 
@@ -178,8 +176,9 @@ const errorHandler = (
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ): void => {
+
   const error = {
-    ...err,
+    message: err.message,
     statusCode: (err as AppError).statusCode || 500,
     status: (err as AppError).status || 'error',
     isOperational: (err as AppError).isOperational
@@ -190,7 +189,6 @@ const errorHandler = (
     console.error('❌ Error occurred:');
     console.error('Message:', error.message);
     console.error('Status Code:', error.statusCode);
-    console.error('Stack:', error.stack);
   } else {
     // In production, only log programming errors
     if (!error.isOperational) {
@@ -202,7 +200,7 @@ const errorHandler = (
   if (config.nodeEnv === 'development') {
     sendErrorDev(error as AppError, res);
   } else {
-    let processedError: AppError | (Error & AppError & MongoError) = { ...error };
+    let processedError: AppError | (Error & AppError & MongoError) = error as (Error & AppError & MongoError);
     processedError.message = error.message;
 
     // Handle MongoDB/Mongoose errors
@@ -211,11 +209,11 @@ const errorHandler = (
     if (error.name === 'ValidationError') processedError = handleValidationError(processedError as MongoError);
 
     // Handle Prisma errors
-    if (err instanceof PrismaClientKnownRequestError ||
-      err instanceof PrismaClientValidationError ||
-      err instanceof PrismaClientInitializationError ||
-      err instanceof PrismaClientRustPanicError) {
-      processedError = handlePrismaError(err);
+    if (error instanceof PrismaClientKnownRequestError ||
+      error instanceof PrismaClientValidationError ||
+      error instanceof PrismaClientInitializationError ||
+      error instanceof PrismaClientRustPanicError) {
+      processedError = handlePrismaError(error);
     }
 
     sendErrorProd(processedError as AppError, res);
