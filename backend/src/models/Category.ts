@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { QueueService } from 'service/queueService/searchIndexService';
 
 // Category Interface
 export interface ICategory extends Document {
@@ -214,6 +215,30 @@ CategorySchema.post('save', async function (doc) {
     }
 });
 
+// Post-save hook to sync to search index
+CategorySchema.post('save', async function (doc) {
+    try {
+        // Sync active categories or when status changes
+        if (doc.isActive || (doc.isModified && doc.isModified('isActive'))) {
+            await QueueService.syncCategoryToSearchIndex(doc._id.toString());
+        }
+    } catch (error) {
+        console.error('Error syncing category to search index:', error);
+        // Don't throw - sync failures shouldn't block category saves
+    }
+});
+
+// Post-delete hook to remove from search index
+CategorySchema.post('deleteOne', { document: true, query: false }, async function (doc) {
+    try {
+        const SearchIndex = (await import('@/models/SearchIndex')).default;
+        await SearchIndex.deleteOne({ entityType: 'category', entityId: doc._id });
+        console.log(`Removed category ${doc._id} from search index`);
+    } catch (error) {
+        console.error('Error removing category from search index:', error);
+    }
+});
+
 CategorySchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     const CategoryModel = mongoose.model('Category');
 
@@ -279,27 +304,6 @@ CategorySchema.statics.getBreadcrumb = async function (categoryId: string) {
     breadcrumb.push({ name: category.name, slug: category.slug, _id: category._id });
 
     return breadcrumb;
-};
-
-// Instance method to get all descendants
-CategorySchema.methods.getDescendants = function () {
-    return mongoose.model('Category').find({
-        ancestors: this._id
-    });
-};
-
-// Instance method to get direct children
-CategorySchema.methods.getChildren = function () {
-    return mongoose.model('Category').find({
-        parent: this._id,
-        isActive: true
-    }).sort({ displayOrder: 1, name: 1 });
-};
-
-// Instance method to get full path (slug-based)
-CategorySchema.methods.getFullPath = async function () {
-    const breadcrumb = await mongoose.model<ICategory, ICategoryModel>('Category').getBreadcrumb(this._id);
-    return breadcrumb.map((cat: { slug: string }) => cat.slug).join('/');
 };
 
 // Instance method to update product count
