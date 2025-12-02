@@ -9,6 +9,7 @@ import productRoutes from './productRoutes';
 import searchRoutes from './searchRoutes';
 import testRoutes from './testRoutes';
 import productReviewRoutes from './productReviewRoutes';
+import cookieParser from 'cookie-parser';
 
 const router = express.Router();
 
@@ -16,6 +17,8 @@ const router = express.Router();
  * Central route configuration
  * Mount all route modules here
  */
+
+router.use(cookieParser());
 
 // Authentication routes
 router.use('/auth', authRoutes);

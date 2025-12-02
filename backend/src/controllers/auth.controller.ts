@@ -84,6 +84,14 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
         },
     });
 
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        path: "/auth/refresh",
+    });
+
+
     // 9. Send response
     res.status(201).json({
         status: 'success',
@@ -92,9 +100,6 @@ export const signup = asyncHandler(async (req: Request, res: Response) => {
             user,
             tokens: {
                 accessToken,
-                refreshToken,
-                accessTokenExpiresIn: config.jwtAccessExpiration,
-                refreshTokenExpiresIn: config.jwtRefreshExpiration,
             },
         },
     });
@@ -149,6 +154,13 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
         },
     });
 
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        path: "/auth/refresh",
+    });
+
     // 8. Prepare user data (exclude password)
     const { password: _, ...userWithoutPassword } = user;
 
@@ -160,9 +172,6 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
             user: userWithoutPassword,
             tokens: {
                 accessToken,
-                refreshToken,
-                accessTokenExpiresIn: config.jwtAccessExpiration,
-                refreshTokenExpiresIn: config.jwtRefreshExpiration,
             },
         },
     });
@@ -181,7 +190,7 @@ export const refreshAccessToken = asyncHandler(async (req: Request, res: Respons
     }
 
     // 2. Verify refresh token signature
-       await verifyRefreshToken(refreshToken);
+    await verifyRefreshToken(refreshToken);
 
     // 3. Check if refresh token exists in database and is not expired
     const storedToken = await prisma.refreshToken.findUnique({
@@ -223,7 +232,6 @@ export const refreshAccessToken = asyncHandler(async (req: Request, res: Respons
         message: 'Access token refreshed successfully',
         data: {
             accessToken: newAccessToken,
-            accessTokenExpiresIn: config.jwtAccessExpiration,
         },
     });
 });
