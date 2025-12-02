@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
+import { QueueService } from 'service/queueService/searchIndexService';
 
 // Product Variant Interface
 export interface IProductVariant {
@@ -374,6 +375,30 @@ ProductSchema.pre('save', function (next) {
   }
   // @ts-ignore
   next();
+});
+
+// Post-save hook to sync to search index
+ProductSchema.post('save', async function (doc) {
+  try {
+    // Only sync active products or when deleting (status change)
+    if (doc.status === 'active' || (doc.isModified && doc.isModified('status'))) {
+      await QueueService.syncProductToSearchIndex(doc._id.toString());
+    }
+  } catch (error) {
+    console.error('Error syncing product to search index:', error);
+    // Don't throw - sync failures shouldn't block product saves
+  }
+});
+
+// Post-delete hook to remove from search index
+ProductSchema.post('deleteOne', { document: true, query: false }, async function (doc) {
+  try {
+    const SearchIndex = (await import('@/models/SearchIndex')).default;
+    await SearchIndex.deleteOne({ entityType: 'product', entityId: doc._id });
+    console.log(`Removed product ${doc._id} from search index`);
+  } catch (error) {
+    console.error('Error removing product from search index:', error);
+  }
 });
 
 // Static method to find featured products

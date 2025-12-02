@@ -5,28 +5,28 @@ export interface ISearchIndex extends Document {
   // Reference
   entityType: 'product' | 'category';
   entityId: mongoose.Types.ObjectId;
-  
+
   // Searchable fields (denormalized for fast search)
   name: string;
   description: string;
   keywords: string[];
-  
+
   // Product-specific fields
   categoryName?: string;
   categorySlug?: string;
   brand?: string;
   tags?: string[];
   sku?: string;
-  
+
   // Metadata for filtering
   price?: number;
   rating?: number;
   isActive: boolean;
-  
+
   // Search optimization
   searchText: string; // Combined text for full-text search
   popularity: number; // Based on views, sales, etc.
-  
+
   // Timestamps
   lastSyncedAt: Date;
   createdAt: Date;
@@ -62,7 +62,7 @@ interface ISearchIndexModel extends Model<ISearchIndex> {
 }
 
 // Search Index Schema
-const SearchIndexSchema = new Schema<ISearchIndex,ISearchIndexModel>(
+const SearchIndexSchema = new Schema<ISearchIndex, ISearchIndexModel>(
   {
     // Reference
     entityType: {
@@ -76,7 +76,7 @@ const SearchIndexSchema = new Schema<ISearchIndex,ISearchIndexModel>(
       required: true,
       index: true
     },
-    
+
     // Searchable fields
     name: {
       type: String,
@@ -93,7 +93,7 @@ const SearchIndexSchema = new Schema<ISearchIndex,ISearchIndexModel>(
       default: [],
       index: true
     },
-    
+
     // Product-specific fields
     categoryName: {
       type: String,
@@ -115,7 +115,7 @@ const SearchIndexSchema = new Schema<ISearchIndex,ISearchIndexModel>(
       sparse: true,
       index: true
     },
-    
+
     // Metadata for filtering
     price: {
       type: Number,
@@ -130,7 +130,7 @@ const SearchIndexSchema = new Schema<ISearchIndex,ISearchIndexModel>(
       default: true,
       index: true
     },
-    
+
     // Search optimization
     searchText: {
       type: String,
@@ -141,7 +141,7 @@ const SearchIndexSchema = new Schema<ISearchIndex,ISearchIndexModel>(
       default: 0,
       index: true
     },
-    
+
     // Timestamps
     lastSyncedAt: {
       type: Date,
@@ -162,9 +162,9 @@ SearchIndexSchema.index({ price: 1, isActive: 1 });
 SearchIndexSchema.index({ rating: -1, isActive: 1 });
 
 // Text index for full-text search
-SearchIndexSchema.index({ 
-  name: 'text', 
-  description: 'text', 
+SearchIndexSchema.index({
+  name: 'text',
+  description: 'text',
   keywords: 'text',
   brand: 'text',
   tags: 'text',
@@ -182,7 +182,7 @@ SearchIndexSchema.index({
 });
 
 // Pre-save middleware to build searchText
-SearchIndexSchema.pre('save', function(next) {
+SearchIndexSchema.pre('save', function (next) {
   // Combine all searchable fields into searchText
   const parts = [
     this.name,
@@ -193,36 +193,36 @@ SearchIndexSchema.pre('save', function(next) {
     this.categoryName || '',
     this.sku || ''
   ];
-  
+
   this.searchText = parts
     .filter(p => p && p.trim().length > 0)
     .join(' ')
     .toLowerCase()
     .trim();
-  
+
   // @ts-ignore
   next();
 });
 
 // Static method to sync product to search index
-SearchIndexSchema.statics.syncProduct = async function(productId: string) {
+SearchIndexSchema.statics.syncProduct = async function (productId: string) {
   const Product = mongoose.model('Product');
-  
+
   const product = await Product.findById(productId).populate('category');
-  
+
   if (!product) {
     // Remove from index if product doesn't exist
     await this.deleteOne({ entityType: 'product', entityId: productId });
     return null;
   }
-  
+
   const category = product.category as any;
-  
+
   // Extract all variant SKUs
-  const skus = product.hasVariants 
+  const skus = product.hasVariants
     ? product.variants.map((v: any) => v.sku).filter(Boolean)
     : [];
-  
+
   // Build keywords
   const keywords = [
     ...product.tags,
@@ -230,7 +230,7 @@ SearchIndexSchema.statics.syncProduct = async function(productId: string) {
     category?.name || '',
     ...skus
   ].filter(Boolean);
-  
+
   const indexData = {
     entityType: 'product',
     entityId: product._id,
@@ -248,7 +248,7 @@ SearchIndexSchema.statics.syncProduct = async function(productId: string) {
     popularity: (product.viewCount || 0) + (product.salesCount || 0) * 10,
     lastSyncedAt: new Date()
   };
-  
+
   return this.findOneAndUpdate(
     { entityType: 'product', entityId: product._id },
     indexData,
@@ -257,15 +257,15 @@ SearchIndexSchema.statics.syncProduct = async function(productId: string) {
 };
 
 // Static method to sync category to search index
-SearchIndexSchema.statics.syncCategory = async function(categoryId: string) {
+SearchIndexSchema.statics.syncCategory = async function (categoryId: string) {
   const Category = mongoose.model('Category');
   const category = await Category.findById(categoryId);
-  
+
   if (!category) {
     await this.deleteOne({ entityType: 'category', entityId: categoryId });
     return null;
   }
-  
+
   const indexData = {
     entityType: 'category',
     entityId: category._id,
@@ -276,7 +276,7 @@ SearchIndexSchema.statics.syncCategory = async function(categoryId: string) {
     popularity: category.productCount || 0,
     lastSyncedAt: new Date()
   };
-  
+
   return this.findOneAndUpdate(
     { entityType: 'category', entityId: category._id },
     indexData,
@@ -285,7 +285,7 @@ SearchIndexSchema.statics.syncCategory = async function(categoryId: string) {
 };
 
 // Static method to perform search
-SearchIndexSchema.statics.search = async function(query: string, options: any = {}) {
+SearchIndexSchema.statics.search = async function (query: string, options: any = {}) {
   const {
     entityType = null,
     limit = 20,
@@ -293,49 +293,49 @@ SearchIndexSchema.statics.search = async function(query: string, options: any = 
     filters = {},
     sort = { popularity: -1, rating: -1 }
   } = options;
-  
+
   const searchQuery: any = {
     $text: { $search: query },
     isActive: true
   };
-  
+
   if (entityType) {
     searchQuery.entityType = entityType;
   }
-  
+
   // Apply filters
   if (filters.brand) {
     searchQuery.brand = filters.brand;
   }
-  
+
   if (filters.category) {
     searchQuery.categorySlug = filters.category;
   }
-  
+
   if (filters.minPrice || filters.maxPrice) {
     searchQuery.price = {};
     if (filters.minPrice) searchQuery.price.$gte = filters.minPrice;
     if (filters.maxPrice) searchQuery.price.$lte = filters.maxPrice;
   }
-  
+
   if (filters.minRating) {
     searchQuery.rating = { $gte: filters.minRating };
   }
-  
+
   if (filters.tags && filters.tags.length > 0) {
     searchQuery.tags = { $in: filters.tags };
   }
-  
+
   const results = await this.find(searchQuery, {
     score: { $meta: 'textScore' }
   })
-  .sort({ score: { $meta: 'textScore' }, ...sort })
-  .limit(limit)
-  .skip(skip)
-  .lean();
-  
+    .sort({ score: { $meta: 'textScore' }, ...sort })
+    .limit(limit)
+    .skip(skip)
+    .lean();
+
   const total = await this.countDocuments(searchQuery);
-  
+
   return {
     results,
     total,
@@ -345,9 +345,9 @@ SearchIndexSchema.statics.search = async function(query: string, options: any = 
 };
 
 // Static method to get search suggestions/autocomplete
-SearchIndexSchema.statics.getSuggestions = async function(query: string, limit: number = 5) {
+SearchIndexSchema.statics.getSuggestions = async function (query: string, limit: number = 5) {
   const regex = new RegExp(`^${query}`, 'i');
-  
+
   return this.find({
     $or: [
       { name: regex },
@@ -356,35 +356,35 @@ SearchIndexSchema.statics.getSuggestions = async function(query: string, limit: 
     ],
     isActive: true
   })
-  .select('name entityType brand')
-  .sort({ popularity: -1 })
-  .limit(limit)
-  .lean();
+    .select('name entityType brand')
+    .sort({ popularity: -1 })
+    .limit(limit)
+    .lean();
 };
 
 // Static method to get popular searches
-SearchIndexSchema.statics.getPopular = async function(entityType: string = 'product', limit: number = 10) {
+SearchIndexSchema.statics.getPopular = async function (entityType: string = 'product', limit: number = 10) {
   return this.find({
     entityType,
     isActive: true
   })
-  .select('name entityType brand price rating')
-  .sort({ popularity: -1, rating: -1 })
-  .limit(limit)
-  .lean();
+    .select('name entityType brand price rating')
+    .sort({ popularity: -1, rating: -1 })
+    .limit(limit)
+    .lean();
 };
 
 // Static method to sync all products
-SearchIndexSchema.statics.syncAllProducts = async function() {
+SearchIndexSchema.statics.syncAllProducts = async function () {
   const Product = mongoose.model('Product');
   const products = await Product.find({ status: 'active' }).select('_id');
-  
+
   const results = {
     synced: 0,
     failed: 0,
     errors: [] as any[]
   };
-  
+
   for (const product of products) {
     try {
       await this.syncProduct(product._id.toString());
@@ -394,21 +394,21 @@ SearchIndexSchema.statics.syncAllProducts = async function() {
       results.errors.push({ productId: product._id, error });
     }
   }
-  
+
   return results;
 };
 
 // Static method to sync all categories
-SearchIndexSchema.statics.syncAllCategories = async function() {
+SearchIndexSchema.statics.syncAllCategories = async function () {
   const Category = mongoose.model('Category');
   const categories = await Category.find({ isActive: true }).select('_id');
-  
+
   const results = {
     synced: 0,
     failed: 0,
     errors: [] as any[]
   };
-  
+
   for (const category of categories) {
     try {
       await this.syncCategory(category._id.toString());
@@ -418,19 +418,19 @@ SearchIndexSchema.statics.syncAllCategories = async function() {
       results.errors.push({ categoryId: category._id, error });
     }
   }
-  
+
   return results;
 };
 
 // Static method to rebuild entire index
-SearchIndexSchema.statics.rebuildIndex = async function() {
+SearchIndexSchema.statics.rebuildIndex = async function () {
   // Clear existing index
   await this.deleteMany({});
-  
+
   // Sync all products and categories
   const productResults = await this.syncAllProducts();
   const categoryResults = await this.syncAllCategories();
-  
+
   return {
     products: productResults,
     categories: categoryResults,
@@ -439,7 +439,7 @@ SearchIndexSchema.statics.rebuildIndex = async function() {
 };
 
 // Model
-const SearchIndex: Model<ISearchIndex> = mongoose.model<ISearchIndex>(
+const SearchIndex = mongoose.model<ISearchIndex, ISearchIndexModel>(
   'SearchIndex',
   SearchIndexSchema
 );
