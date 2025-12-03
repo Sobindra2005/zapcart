@@ -9,8 +9,6 @@
 
 ## 🏗️ Architecture
 
-## Architecture
-
 ```mermaid
 graph TB
     Client[Browser] -->|Port 80| Nginx[Nginx Reverse Proxy]
