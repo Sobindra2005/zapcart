@@ -9,6 +9,21 @@
 
 ## 🏗️ Architecture
 
+```mermaid
+graph TB
+    Client[Browser] -->|Port 80| Nginx[Nginx Reverse Proxy]
+    Nginx -->|/api/*| Backend[Express Backend :8080]
+    Nginx -->|/, /_next/*| NextJS[Next.js Client :3000]
+    Backend --> Redis[Redis :6379]
+    Backend --> MongoDB[(MongoDB)]
+    Backend --> PostgreSQL[(PostgreSQL)]
+    
+    style Nginx fill:#2196F3,color:#fff
+    style NextJS fill:#000,color:#fff
+    style Backend fill:#68A063,color:#fff
+    style Redis fill:#DC382D,color:#fff
+```
+
 This platform uses **polyglot persistence** - combining PostgreSQL and MongoDB to leverage the strengths of both databases:
 
 - **PostgreSQL (Prisma)**: Transactional data - orders, payments, users, inventory
