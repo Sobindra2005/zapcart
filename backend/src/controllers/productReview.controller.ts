@@ -23,8 +23,11 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
         throw new AppError('Invalid product ID', 400);
     }
 
-    // Build sort object
-    const sortOption: any = {};
+    // Build sort object with string keys for MongoDB
+    type MongoSortOrder = 1 | -1;
+    const sortOption: Record<string, MongoSortOrder> = {};
+    
+
     if (sort === 'createdAt') {
         sortOption.createdAt = -1;
     } else if (sort === 'rating') {
@@ -41,13 +44,19 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
     const reviews = await ProductReview.getProductReviews(productId, {
         limit: limitNum,
         skip,
-        sort: sortOption,
+        sort: sort as string,
         rating: rating ? Number(rating) : null,
         verifiedOnly: verifiedOnly === 'true',
     });
 
+    interface ReviewQuery {
+        product: string;
+        status: string;
+        rating?: number;
+        isVerifiedPurchase?: boolean;
+    }
     // Get total count
-    const query: any = {
+    const query: ReviewQuery = {
         product: productId,
         status: 'approved',
     };

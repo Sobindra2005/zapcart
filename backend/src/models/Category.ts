@@ -175,7 +175,7 @@ CategorySchema.pre('save', async function (next) {
         }
     }
 
-    // @ts-expect-error
+    // @ts-expect-error-next function 
     next();
 });
 
@@ -184,7 +184,7 @@ CategorySchema.pre('save', async function (next) {
     if (this.parent && this.isModified('parent')) {
         // Check if parent is the same as current category
         if (this.parent.equals(this._id)) {
-            // @ts-expect-error
+            // @ts-expect-error-next function 
             return next(new Error('A category cannot be its own parent'));
         }
 
@@ -195,11 +195,11 @@ CategorySchema.pre('save', async function (next) {
 
         const descendantIds = descendants.map(d => d._id.toString());
         if (descendantIds.includes(this.parent.toString())) {
-            // @ts-expect-error
+            // @ts-expect-error-next function 
             return next(new Error('Cannot set a descendant category as parent (circular reference)'));
         }
     }
-    // @ts-expect-error
+    // @ts-expect-error-next function 
     next();
 });
 
@@ -261,7 +261,7 @@ CategorySchema.pre('deleteOne', { document: true, query: false }, async function
 
         await descendant.save();
     }
-    // @ts-expect-error
+    // @ts-expect-error-next function 
     next();
 });
 

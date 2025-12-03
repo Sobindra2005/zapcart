@@ -377,7 +377,7 @@ ProductSchema.pre('save', function (next) {
   if (this.hasVariants && this.variants && this.variants.length > 0) {
     this.totalStock = this.variants.reduce((sum, variant) => sum + variant.stock, 0);
   }
-  // @ts-expect-error
+  // @ts-expect-error-next function
   next();
 });
 
@@ -386,7 +386,7 @@ ProductSchema.pre('save', function (next) {
   if (this.isModified('status') && this.status === 'active' && !this.publishedAt) {
     this.publishedAt = new Date();
   }
-  // @ts-expect-error
+  // @ts-expect-error-next function
   next();
 });
 

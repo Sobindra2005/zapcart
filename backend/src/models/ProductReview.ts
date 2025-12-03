@@ -233,7 +233,7 @@ ProductReviewSchema.pre('save', async function (next) {
       }
     }
   }
-  // @ts-expect-error
+  // @ts-expect-error-next function
   next();
 });
 

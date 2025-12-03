@@ -260,7 +260,7 @@ SearchIndexSchema.pre('save', function (next) {
     .toLowerCase()
     .trim();
 
-  // @ts-ignore
+  // @ts-expect-error-next function
   next();
 });
 
