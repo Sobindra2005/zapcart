@@ -162,6 +162,7 @@ export const login = asyncHandler(async (req: Request, res: Response) => {
     });
 
     // 8. Prepare user data (exclude password)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password: _, ...userWithoutPassword } = user;
 
     // 9. Send response

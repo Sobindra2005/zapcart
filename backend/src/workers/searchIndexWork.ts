@@ -18,23 +18,25 @@ async function processSearchIndexJob(job: Job<SearchIndexJobData>) {
 
     try {
         switch (job.data.type) {
-            case 'sync-product':
+            case 'sync-product': {
                 if (!job.data.entityId) {
                     throw new Error('entityId is required for sync-product');
                 }
                 await SearchIndex.syncProduct(job.data.entityId);
                 console.log(`✅ Synced product ${job.data.entityId} to search index`);
                 break;
+            }
 
-            case 'sync-category':
+            case 'sync-category': {
                 if (!job.data.entityId) {
                     throw new Error('entityId is required for sync-category');
                 }
                 await SearchIndex.syncCategory(job.data.entityId);
                 console.log(`✅ Synced category ${job.data.entityId} to search index`);
                 break;
+            }
 
-            case 'rebuild-index':
+            case 'rebuild-index': {
                 console.log('🔨 Rebuilding entire search index...');
                 const result = await SearchIndex.rebuildIndex();
                 console.log(`✅ Rebuilt search index:`, {
@@ -51,12 +53,14 @@ async function processSearchIndexJob(job: Job<SearchIndexJobData>) {
                     console.error('Category sync errors:', result.categories.errors);
                 }
                 break;
-
-            default:
+            }
+            default: {
                 throw new Error(`Unknown job type: ${job.data.type}`);
+            }
         }
-    } catch (error: any) {
-        console.error(`❌ Error processing search index job ${job.id}:`, error.message);
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ Error processing search index job ${job.id}:`, errorMessage);
         throw error; // Re-throw to mark job as failed
     }
 }

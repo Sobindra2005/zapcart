@@ -94,7 +94,7 @@ export interface IProductModel extends Model<IProduct> {
   findFeatured(limit?: number): Promise<IProduct[]>;
   findByCategory(
     categoryId: string,
-    options?: { limit?: number; skip?: number; sort?: any }
+    options?: { limit?: number; skip?: number; sort?: string }
   ): Promise<IProduct[]>;
 }
 
@@ -377,7 +377,7 @@ ProductSchema.pre('save', function (next) {
   if (this.hasVariants && this.variants && this.variants.length > 0) {
     this.totalStock = this.variants.reduce((sum, variant) => sum + variant.stock, 0);
   }
-  // @ts-ignore
+  // @ts-expect-error
   next();
 });
 
@@ -386,7 +386,7 @@ ProductSchema.pre('save', function (next) {
   if (this.isModified('status') && this.status === 'active' && !this.publishedAt) {
     this.publishedAt = new Date();
   }
-  // @ts-ignore
+  // @ts-expect-error
   next();
 });
 
@@ -426,7 +426,7 @@ ProductSchema.statics.findFeatured = function (limit: number = 10) {
 };
 
 // Static method to find products by category
-ProductSchema.statics.findByCategory = function (categoryId: string, options: any = {}) {
+ProductSchema.statics.findByCategory = function (categoryId: string, options: { limit?: number; skip?: number; sort?: string } = {}) {
   const { limit = 20, skip = 0, sort = { createdAt: -1 } } = options;
   return this.find({
     category: categoryId,

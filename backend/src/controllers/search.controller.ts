@@ -3,6 +3,24 @@ import asyncHandler from '@/utils/asyncHandler';
 import AppError from '@/utils/AppError';
 import SearchIndex from '@/models/SearchIndex';
 import { QueueService } from 'service/queueService/searchIndexService';
+
+interface SearchFilters {
+    brand?: string;
+    category?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minRating?: number;
+    tags?: string[];
+}
+
+interface SortOptions {
+    [key: string]: number | undefined;
+    popularity?: number;
+    rating?: number;
+    price?: number;
+}
+
+
 /**
  * Search products and categories
  * GET /api/v1/search?q=query&entityType=product&page=1&limit=20
@@ -27,28 +45,31 @@ export const searchProducts = asyncHandler(async (req: Request, res: Response) =
     }
 
     // Build filters
-    const filters: any = {};
-    if (brand) filters.brand = brand;
-    if (category) filters.category = category;
+    const filters: SearchFilters = {};
+    if (brand) filters.brand = brand as string;
+    if (category) filters.category = category as string;
     if (minPrice) filters.minPrice = Number(minPrice);
     if (maxPrice) filters.maxPrice = Number(maxPrice);
     if (minRating) filters.minRating = Number(minRating);
-    if (tags) filters.tags = Array.isArray(tags) ? tags : [tags];
+    if (tags) filters.tags = Array.isArray(tags) ? tags as string[] : [tags as string];
 
     // Build sort
-    let sortOptions = { popularity: -1, rating: -1 };
+    let sortOptions: SortOptions = { popularity: -1, rating: -1 };
     if (sort === 'price-asc') {
-        sortOptions = { price: 1, popularity: -1 } as any;
+        sortOptions = { price: 1, popularity: -1 };
     } else if (sort === 'price-desc') {
-        sortOptions = { price: -1, popularity: -1 } as any;
+        sortOptions = { price: -1, popularity: -1 };
     } else if (sort === 'rating') {
-        sortOptions = { rating: -1, popularity: -1 } as any;
+        sortOptions = { rating: -1, popularity: -1 };
     }
 
     const skip = (Number(page) - 1) * Number(limit);
 
+    // Validate entityType
+    const validEntityType = entityType === 'product' || entityType === 'category' ? entityType : null;
+
     const searchResults = await SearchIndex.search(q as string, {
-        entityType: entityType || null,
+        entityType: validEntityType,
         limit: Number(limit),
         skip,
         filters,

@@ -45,7 +45,13 @@ export const createCategory = asyncHandler(async (req: Request, res: Response) =
 export const getAllCategories = asyncHandler(async (req: Request, res: Response) => {
     const { isActive, level, search } = req.query;
 
-    const filter: any = {};
+    interface CategoryFilter {
+        isActive?: boolean;
+        level?: number;
+        $text?: { $search: string };
+    }
+
+    const filter: CategoryFilter = {};
 
     // Filter by active status
     if (isActive !== undefined) {
@@ -132,7 +138,7 @@ export const getCategoryById = asyncHandler(async (req: Request, res: Response) 
         const children = await Category.find({ parent: category._id, isActive: true })
             .sort({ displayOrder: 1, name: 1 })
             .lean();
-        (category as any).children = children;
+        (category as ICategory).children = children;
     }
 
     res.status(200).json({

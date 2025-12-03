@@ -30,7 +30,7 @@ export interface ICategory extends Document {
     productCount: number;
 
     // Virtual properties
-    children?: any[];
+    children?: ICategory[];
 
     // Timestamps
     createdAt: Date;
@@ -43,9 +43,9 @@ interface ICategoryModel extends Model<ICategory> {
     getChildren(): Promise<ICategory[]>;
     getFullPath(): Promise<string>;
     updateProductCount(): Promise<ICategory>;
-    getCategoryTree(parentId?: string | null): Promise<any[]>;
+    getCategoryTree(parentId?: string | null): Promise<ICategory[]>;
     getRootCategories(): Promise<ICategory[]>;
-    getBreadcrumb(categoryId: string): Promise<any[]>;
+    getBreadcrumb(categoryId: string): Promise<ICategory[]>;
 }
 
 const CategorySchema = new Schema<ICategory, ICategoryModel>(
@@ -175,7 +175,7 @@ CategorySchema.pre('save', async function (next) {
         }
     }
 
-    // @ts-ignore
+    // @ts-expect-error
     next();
 });
 
@@ -184,7 +184,7 @@ CategorySchema.pre('save', async function (next) {
     if (this.parent && this.isModified('parent')) {
         // Check if parent is the same as current category
         if (this.parent.equals(this._id)) {
-            // @ts-ignore
+            // @ts-expect-error
             return next(new Error('A category cannot be its own parent'));
         }
 
@@ -195,11 +195,11 @@ CategorySchema.pre('save', async function (next) {
 
         const descendantIds = descendants.map(d => d._id.toString());
         if (descendantIds.includes(this.parent.toString())) {
-            // @ts-ignore
+            // @ts-expect-error
             return next(new Error('Cannot set a descendant category as parent (circular reference)'));
         }
     }
-    // @ts-ignore
+    // @ts-expect-error
     next();
 });
 
@@ -248,7 +248,7 @@ CategorySchema.pre('deleteOne', { document: true, query: false }, async function
     for (const descendant of descendants) {
         // Remove this category from ancestors array
         descendant.ancestors = descendant.ancestors.filter(
-            (id: any) => !id.equals(this._id)
+            (id: mongoose.Types.ObjectId) => !id.equals(this._id)
         );
 
         // Recalculate level based on remaining ancestors
@@ -261,7 +261,7 @@ CategorySchema.pre('deleteOne', { document: true, query: false }, async function
 
         await descendant.save();
     }
-    // @ts-ignore
+    // @ts-expect-error
     next();
 });
 

@@ -61,6 +61,19 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
     });
 });
 
+interface ProductFilter {
+    category?: string;
+    brand?: string;
+    basePrice?: {
+        $gte?: number;
+        $lte?: number;
+    };
+    status?: string;
+    visibility?: string | { $in?: string[] };
+    $text?: { $search: string };
+}
+
+
 /**
  * Get all products with filtering, search, sorting, and pagination
  * GET /api/v1/products
@@ -70,7 +83,7 @@ export const getAllProducts = asyncHandler(async (req: Request, res: Response) =
         page = 1,
         limit = 20,
         sort = '-createdAt',
-        category,
+        category ,
         brand,
         minPrice,
         maxPrice,
@@ -80,16 +93,16 @@ export const getAllProducts = asyncHandler(async (req: Request, res: Response) =
         featured,
     } = req.query;
 
-    const filter: any = {};
+    const filter: ProductFilter = {};
 
     // Filter by category
     if (category) {
-        filter.category = category;
+        filter.category = category as string;
     }
 
     // Filter by brand
     if (brand) {
-        filter.brand = brand;
+        filter.brand = brand as string;
     }
 
     // Filter by price range
@@ -101,7 +114,7 @@ export const getAllProducts = asyncHandler(async (req: Request, res: Response) =
 
     // Filter by status
     if (status) {
-        filter.status = status;
+        filter.status = status as string;
     } else {
         // Default to active for public queries
         filter.status = 'active';
@@ -109,7 +122,7 @@ export const getAllProducts = asyncHandler(async (req: Request, res: Response) =
 
     // Filter by visibility
     if (visibility) {
-        filter.visibility = visibility;
+        filter.visibility = visibility as string | { $in?: string[] };
     } else if (featured === 'true') {
         filter.visibility = 'featured';
     }

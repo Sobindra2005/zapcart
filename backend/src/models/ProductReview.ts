@@ -58,7 +58,7 @@ export interface IProductReviewModel extends Model<IProductReview> {
     options?: {
       limit?: number;
       skip?: number;
-      sort?: any;
+      sort?: string;
       rating?: number | null;
       verifiedOnly?: boolean;
     }
@@ -224,7 +224,7 @@ ProductReviewSchema.pre('save', async function (next) {
     if (order) {
       // Check if product is in the order
       const orderItems = order.items || [];
-      const productInOrder = orderItems.some((item: any) =>
+      const productInOrder = orderItems.some((item: { product: mongoose.Types.ObjectId }) =>
         item.product.toString() === this.product.toString()
       );
 
@@ -233,7 +233,7 @@ ProductReviewSchema.pre('save', async function (next) {
       }
     }
   }
-  // @ts-ignore
+  // @ts-expect-error
   next();
 });
 
@@ -283,7 +283,7 @@ ProductReviewSchema.post('deleteOne', { document: true, query: false }, async fu
 // Static method to get reviews for a product
 ProductReviewSchema.statics.getProductReviews = function (
   productId: string,
-  options: any = {}
+  options: { limit?: number; skip?: number; sort?: string, rating?: number, verifiedOnly?: boolean } = {}
 ) {
   const {
     limit = 10,
@@ -293,7 +293,12 @@ ProductReviewSchema.statics.getProductReviews = function (
     verifiedOnly = false
   } = options;
 
-  const query: any = {
+  const query: {
+    product: string;
+    status: string;
+    rating?: number;
+    isVerifiedPurchase?: boolean
+  } = {
     product: productId,
     status: 'approved'
   };
@@ -354,7 +359,7 @@ ProductReviewSchema.statics.getRatingDistribution = async function (productId: s
 };
 
 // Static method to get user's reviews
-ProductReviewSchema.statics.getUserReviews = function (userId: string, options: any = {}) {
+ProductReviewSchema.statics.getUserReviews = function (userId: string, options: { limit?: number; skip?: number } = {}) {
   const { limit = 10, skip = 0 } = options;
 
   return this.find({ user: userId })

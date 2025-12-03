@@ -8,6 +8,7 @@ import asyncHandler from '@/utils/asyncHandler';
 /**
  * Extend Express Request interface to include user
  */
+/* eslint-disable @typescript-eslint/no-namespace */    
 declare global {
     namespace Express {
         interface Request {

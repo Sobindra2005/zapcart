@@ -30,6 +30,17 @@ const getEstimatedDeliveryDays = async (): Promise<number> => {
     return parseInt(days || '5', 10);
 };
 
+interface OrderItemInput {
+    productId: number;
+    productName: string;
+    sku: string;
+    variantId?: number;
+    variantName?: string;
+    quantity: number;
+    unitPrice: number;
+    discount?: number;
+}
+
 /**
  * Create a new order
  * POST /api/v1/orders
@@ -64,7 +75,7 @@ export const createOrder = asyncHandler(async (req: Request, res: Response) => {
 
     // 3. Calculate totals (Server-side calculation is safer, but we are trusting client for unitPrice for now as per plan)
     let subtotal = 0;
-    const orderItemsData = items.map((item: any) => {
+    const orderItemsData = items.map((item: OrderItemInput) => {
         const itemTotal = (item.unitPrice * item.quantity) - (item.discount || 0);
         subtotal += itemTotal;
         return {
