@@ -18,7 +18,6 @@ EXPOSE 8080
 # Start with hot reload
 CMD ["npm", "run", "dev"]
 
-
 # Dockerfile (production)
 # FROM node:20-alpine AS builder
 
