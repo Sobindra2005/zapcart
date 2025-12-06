@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { MainContainer } from "./wrapper";
+import { useState } from "react";
 
 export function Header() {
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
+
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-white">
             <MainContainer className="container flex h-16 items-center justify-between">
@@ -19,43 +22,66 @@ export function Header() {
                 </Link>
 
                 {/* Navigation */}
-                <nav className="hidden items-center gap-6 md:flex ">
-                    <button className="flex items-center gap-1 text-sm font-medium hover:text-emerald-600 transition-colors">
+                <nav className="hidden items-center gap-6 md:flex flex-1 max-w-3xl">
+                    <button className="flex items-center gap-1 text-sm font-medium hover:text-emerald-600 transition-colors whitespace-nowrap">
                         Categories
                         <ChevronDown className="h-4 w-4" />
                     </button>
-                    <Link href="/deals" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-                        Deals
-                    </Link>
-                    <Link href="/new" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-                        What&apos;s New
-                    </Link>
-                    <Link href="/delivery" className="text-sm font-medium hover:text-emerald-600 transition-colors">
-                        Delivery
-                    </Link>
+                    
+                    <div className="flex items-center gap-6 flex-1">
+                        <Link 
+                            href="/deals" 
+                            className={`text-sm font-medium hover:text-emerald-600 transition-all duration-300 whitespace-nowrap ${
+                                isSearchFocused ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+                            }`}
+                        >
+                            Deals
+                        </Link>
+                        <Link 
+                            href="/new" 
+                            className={`text-sm font-medium hover:text-emerald-600 transition-all duration-300 whitespace-nowrap ${
+                                isSearchFocused ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+                            }`}
+                        >
+                            What&apos;s New
+                        </Link>
+                        <Link 
+                            href="/delivery" 
+                            className={`text-sm font-medium hover:text-emerald-600 transition-all duration-300 whitespace-nowrap ${
+                                isSearchFocused ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
+                            }`}
+                        >
+                            Delivery
+                        </Link>
+
+                        <div className={`hidden flex-1  lg:block transition-all duration-300 ${
+                            isSearchFocused ? 'ml-0' : 'ml-8'
+                        }`}>
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    type="search"
+                                    placeholder="Search Product"
+                                    className="pl-10 bg-gray-50 border-0 focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0 w-full"
+                                    onFocus={() => setIsSearchFocused(true)}
+                                    onBlur={() => setIsSearchFocused(false)}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                 </nav>
 
-                {/* Search Bar */}
-                <div className="hidden flex-1 max-w-md mx-8 lg:block">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder="Search Product"
-                            className="pl-10 bg-gray-50 border-gray-200"
-                        />
-                    </div>
-                </div>
 
                 {/* Actions */}
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="icon" className="hidden md:flex">
-                        <User className="h-5 w-5" />
-                        <span className="sr-only">Account</span>
+                    <Button variant="ghost" size="lg" className="hidden md:flex">
+                        <User className="h-6 w-6" />
+                        <span className="">Account</span>
                     </Button>
-                    <Button variant="ghost" size="icon" className="relative">
-                        <ShoppingCart className="h-5 w-5" />
-                        <span className="sr-only">Cart</span>
+                    <Button variant="ghost" size="lg" className="relative">
+                        <ShoppingCart className="h-6 w-6" />
+                        <span className="">Cart</span>
                     </Button>
                 </div>
             </MainContainer>
