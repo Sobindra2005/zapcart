@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Shopcart - Your Electronics Store",
+  title: "ZapCart - Your Electronics Store",
   description: "Shop the latest electronics, headphones, and accessories at great prices",
 };
 

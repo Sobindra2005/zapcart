@@ -5,6 +5,7 @@ import { Search, ShoppingCart, User, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function Header() {
     return (
@@ -12,10 +13,9 @@ export function Header() {
             <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-emerald-600">
-                        <ShoppingCart className="h-5 w-5 text-white" />
+                    <div className="flex h-14 w-42 items-center justify-center">
+                        <Image src="/logo.png" alt="Logo" width={168} height={56} />
                     </div>
-                    <span className="text-xl font-bold">Shopcart</span>
                 </Link>
 
                 {/* Navigation */}

@@ -2,7 +2,6 @@
 
 import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 const filters = [
     { label: "Headphone Type", hasDropdown: true },

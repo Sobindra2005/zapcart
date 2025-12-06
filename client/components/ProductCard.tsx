@@ -21,7 +21,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 {/* Image Container */}
                 <div className="relative aspect-square mb-4 bg-gray-50 rounded-lg overflow-hidden">
                     {/* Placeholder for product image */}
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="w-full h-full flex items-center justify-center  from-gray-100 to-gray-200">
                         <span className="text-gray-400 text-sm">Product Image</span>
                     </div>
 
