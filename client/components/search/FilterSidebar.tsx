@@ -69,7 +69,7 @@ export function FilterSidebar({ onFilterChange, className }: FilterSidebarProps)
     };
 
     const clearFilters = () => {
-        const resetFilters = {
+        const resetFilters: FilterState = {
             brands: [],
             categories: [],
             minPrice: "",
