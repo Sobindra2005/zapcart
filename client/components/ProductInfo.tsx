@@ -8,6 +8,7 @@ import { Product } from "@/types/product";
 import { SizeSelector } from "./SizeSelector";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/contexts/CartContext";
+import { motion } from "framer-motion";
 
 interface ProductInfoProps {
     product: Product;
@@ -19,7 +20,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const [quantity, setQuantity] = useState(1);
     const [descriptionOpen, setDescriptionOpen] = useState(true);
     const [shippingOpen, setShippingOpen] = useState(true);
-    
+
     const { addToCart } = useCart();
     const router = useRouter();
 
@@ -100,14 +101,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         <Plus className="w-4 h-4" />
                     </button>
                 </div>
-                
+
                 {/* Add to Cart Button */}
                 <Button
                     onClick={handleAddToCart}
                     className="flex-1 h-12 rounded-full bg-orange-700 text-white font-medium hover:bg-orange-800"
                     size="lg"
                 >
-                   Add to cart
+                    Add to cart
                 </Button>
 
                 {/* Wishlist Button */}
@@ -139,9 +140,13 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     />
                 </button>
                 {descriptionOpen && (
-                    <div className="py-3 text-sm text-muted-foreground leading-relaxed">
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="py-3 text-sm text-muted-foreground leading-relaxed">
                         {product.detailedDescription || product.description}
-                    </div>
+                    </motion.div>
                 )}
             </div>
 
@@ -161,7 +166,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
                         />
                     </button>
                     {shippingOpen && (
-                        <div className="py-3 space-y-4">
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className="py-3 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="flex items-start gap-3">
                                     <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center shrink-0">
@@ -208,7 +217,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </motion.div>
                     )}
                 </div>
             )}
