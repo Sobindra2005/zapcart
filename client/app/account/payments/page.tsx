@@ -80,7 +80,7 @@ export default function PaymentsPage() {
                         </div>
                         <h3 className="text-lg font-semibold">No payment methods</h3>
                         <p className="text-sm text-muted-foreground max-w-xs mt-1">
-                            You haven't added any payment methods yet. Add one to make
+                            You haven&apos;t added any payment methods yet. Add one to make
                             checkout faster.
                         </p>
                     </CardContent>

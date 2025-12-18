@@ -29,5 +29,6 @@ export interface Product {
     reviews?: Review[];
     category: string;
     sizes?: string[];
+    tags?: string[];
     shippingInfo?: ShippingInfo;
 }

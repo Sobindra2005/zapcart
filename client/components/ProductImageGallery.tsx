@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface ProductImageGalleryProps {
     images: string[];
-    productName: string;
 }
 
-export function ProductImageGallery({ images, productName }: ProductImageGalleryProps) {
+export function ProductImageGallery({ images }: ProductImageGalleryProps) {
     const [selectedImage, setSelectedImage] = useState(0);
 
     return (
@@ -23,7 +21,7 @@ export function ProductImageGallery({ images, productName }: ProductImageGallery
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-4 gap-3">
-                {images.map((image, index) => (
+                {images.map((_, index) => (
                     <button
                         key={index}
                         onClick={() => setSelectedImage(index)}

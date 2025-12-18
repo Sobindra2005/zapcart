@@ -44,7 +44,6 @@ export default function SearchPage() {
             if (filters.minRating !== null && product.rating < filters.minRating) return false;
 
             if (filters.tags.length > 0) {
-                // @ts-ignore
                 const productTags = product.tags as string[] | undefined;
                 if (!productTags || !filters.tags.some(tag => productTags.includes(tag))) {
 
@@ -138,7 +137,7 @@ export default function SearchPage() {
                             </div>
                             <h3 className="text-xl font-semibold mb-2">No results found</h3>
                             <p className="text-muted-foreground mb-6 max-w-sm">
-                                We couldn't find any products matching your search. Try checking for typos or using different keywords.
+                                We couldn&apos;t find any products matching your search. Try checking for typos or using different keywords.
                             </p>
                             <Button
                                 variant="outline"

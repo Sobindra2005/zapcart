@@ -42,8 +42,7 @@ export default function OrdersPage() {
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-muted-foreground hidden sm:inline">Status:</span>
-                                {/* @ts-ignore  - variant string type mismatch risk handled by fallback */}
-                                <Badge variant={statusColor(order.status) as any}>{order.status}</Badge>
+                                <Badge variant={statusColor(order.status)}>{order.status}</Badge>
                             </div>
                         </div>
 
@@ -81,7 +80,7 @@ export default function OrdersPage() {
                     <div className="text-center py-12">
                         <Package className="h-12 w-12 mx-auto text-muted-foreground opacity-50 mb-4" />
                         <h3 className="text-lg font-medium">No orders yet</h3>
-                        <p className="text-muted-foreground">Looks like you haven't placed any orders yet.</p>
+                        <p className="text-muted-foreground">Looks like you haven&apos;t placed any orders yet.</p>
                         <Button className="mt-4" variant="default">Start Shopping</Button>
                     </div>
                 )}

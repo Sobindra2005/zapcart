@@ -27,7 +27,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <div className="py-8 md:py-12">
                 <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
                     {/* Left: Image Gallery */}
-                    <ProductImageGallery images={images} productName={product.name} />
+                    <ProductImageGallery images={images}  />
 
                     {/* Right: Product Info */}
                     <ProductInfo product={product} />

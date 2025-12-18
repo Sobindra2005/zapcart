@@ -79,9 +79,9 @@ export default function LoginPage() {
                     <Button
                         type="submit"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-md rounded-xl h-12 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!form.formState.isValid || !form.watch("email") || !form.watch("password")}
+                        disabled={!form.formState.isValid || form.formState.isSubmitting}
                     >
-                        Continue
+                        {form.formState.isSubmitting ? "Logging in..." : "Continue"}
                     </Button>
                 </form>
             </Form>

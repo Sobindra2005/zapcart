@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { motion } from "framer-motion";
 
+interface OrderDetails {
+    paymentMethod: string;
+}
+
 interface CheckoutFormProps {
-    onPlaceOrder: (details: any) => void;
+    onPlaceOrder: (details: OrderDetails) => void;
     onBack: () => void;
 }
 

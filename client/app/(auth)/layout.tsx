@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { IoShieldCheckmarkSharp } from "react-icons/io5"; // Safe/Shield icon
 
 export default function AuthLayout({
     children,

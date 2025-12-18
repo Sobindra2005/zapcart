@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ShoppingCart, ShoppingBag, Receipt } from "lucide-react";
+import { ShoppingCart, ShoppingBag, Receipt } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { CartItem } from "@/components/CartItem";
@@ -19,7 +19,7 @@ export default function CartPage() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handlePlaceOrder = (details: any) => {
+    const handlePlaceOrder = (details: { paymentMethod: string }) => {
         console.log("Order placed:", details);
         clearCart();
         setStep("order");

@@ -53,7 +53,7 @@ export function AddAddressForm({ open, onOpenChange, onSubmit }: AddAddressFormP
     const handleSubmit = (data: AddressFormData) => {
         // Create new address with mock ID
         const newAddress: Address = {
-            id: `addr-${Date.now()}`,
+            id: crypto.randomUUID(),
             type: data.type,
             street: data.street,
             city: data.city,

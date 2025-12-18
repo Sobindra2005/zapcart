@@ -21,15 +21,19 @@ export function Header() {
 
     // Filter products based on search query
     useEffect(() => {
-        if (searchQuery.trim()) {
-            const filtered = searchProducts.filter((product) =>
-                product.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredProducts(filtered);
-        } else {
-            setFilteredProducts([]);
-        }
-    }, [searchQuery]);
+        const timeout = setTimeout(() => {
+            if (searchQuery.trim()) {
+                const filtered = searchProducts.filter((product) =>
+                    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                setFilteredProducts(filtered);
+            } else {
+                setFilteredProducts([]);
+            }
+        }, 0);
+
+        return () => clearTimeout(timeout);
+    }, [searchQuery, searchProducts]);
 
     // Handle click outside to close dropdown
     useEffect(() => {
