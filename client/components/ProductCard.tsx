@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Heart, Star } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,10 +15,16 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
 
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsFavorite(!isFavorite);
+    };
+
     return (
         <Link href={`/product/${product.id}`}>
             <Card className="group overflow-hidden transition-all ">
-                <CardContent className="p-4 cursor-pointer">
+                <CardContent className="p-4 cursor-pointer ">
                     {/* Image Container */}
                     <div className="relative aspect-square mb-4 bg-gray-50 rounded-lg overflow-hidden">
                         {/* Placeholder for product image */}
@@ -35,7 +40,7 @@ export function ProductCard({ product }: ProductCardProps) {
                                 "absolute top-2 right-2 h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white",
                                 isFavorite && "text-red-500"
                             )}
-                            onClick={() => setIsFavorite(!isFavorite)}
+                            onClick={handleFavoriteClick}
                         >
                             <Heart className={cn("h-4 w-4", isFavorite && "fill-current")} />
                         </Button>
