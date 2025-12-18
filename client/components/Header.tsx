@@ -9,12 +9,15 @@ import { MainContainer } from "./wrapper";
 import { useState, useEffect, useRef } from "react";
 import { searchProducts, popularCategoriesSearch, SearchProduct, PopularCategory } from "@/data/searchSuggestions";
 import { motion } from "framer-motion";
+import { useCart } from "@/contexts/CartContext";
 
 export function Header() {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [filteredProducts, setFilteredProducts] = useState<SearchProduct[]>([]);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const { getTotalItems } = useCart();
+    const totalItems = getTotalItems();
 
     // Filter products based on search query
     useEffect(() => {
@@ -109,9 +112,9 @@ export function Header() {
                                         {/* Popular Categories */}
                                         {showPopularCategories && (
                                             <motion.div
-                                                initial={{ opacity: 0}}
-                                                animate={{ opacity: 1}}
-                                                transition={{ duration:0.5 }}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.5 }}
                                                 className="p-4">
                                                 <h3 className="text-sm font-semibold text-gray-900 mb-4">Popular Categories</h3>
                                                 <div className="grid grid-cols-2 gap-3">
@@ -125,9 +128,9 @@ export function Header() {
                                         {/* Product Suggestions */}
                                         {showProductSuggestions && (
                                             <motion.div
-                                                initial={{ opacity: 0}}
-                                                animate={{ opacity: 1}}
-                                                transition={{ duration:0.5 }} className="py-2">
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.5 }} className="py-2">
                                                 {filteredProducts.map((product) => (
                                                     <ProductSuggestion key={product.id} product={product} />
                                                 ))}
@@ -137,9 +140,9 @@ export function Header() {
                                         {/* No Results */}
                                         {showDropdown && searchQuery.trim() && filteredProducts.length === 0 && (
                                             <motion.div
-                                                initial={{ opacity: 0}}
-                                                animate={{ opacity: 1}}
-                                                transition={{ duration:0.5 }}
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                transition={{ duration: 0.5 }}
                                                 className="p-8 text-center text-gray-500">
                                                 <p className="text-sm">No products found for &quot;{searchQuery}&quot;</p>
                                             </motion.div>
@@ -149,23 +152,30 @@ export function Header() {
                             </div>
                         </div>
                     </div>
-
                 </nav>
-
 
                 {/* Actions */}
                 <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="lg" className="hidden md:flex">
-                        <User className="h-6 w-6" />
-                        <span className="">Account</span>
-                    </Button>
-                    <Button variant="ghost" size="lg" className="relative">
-                        <ShoppingCart className="h-6 w-6" />
-                        <span className="">Cart</span>
-                    </Button>
+                    <Link href="/account">
+                        <Button variant="ghost" size="lg" className="hidden md:flex">
+                            <User className="h-6 w-6" />
+                            <span className="">Account</span>
+                        </Button>
+                    </Link>
+                    <Link href="/cart">
+                        <Button variant="ghost" size="lg" className="relative">
+                            <ShoppingCart className="h-6 w-6" />
+                            <span className="">Cart</span>
+                            {totalItems > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                    {totalItems}
+                                </span>
+                            )}
+                        </Button>
+                    </Link>
                 </div>
             </MainContainer>
-        </header>
+        </header >
     );
 }
 
@@ -173,7 +183,7 @@ export function Header() {
 function CategoryCard({ category }: { category: PopularCategory }) {
     return (
         <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
-            <div className="flex-shrink-0 w-12 h-12 bg-white rounded-lg flex items-center justify-center text-2xl shadow-sm">
+            <div className="shrink-0 w-12 h-12 bg-white rounded-lg flex items-center justify-center text-2xl shadow-sm">
                 {category.icon}
             </div>
             <div className="flex-1 min-w-0">
@@ -189,7 +199,7 @@ function ProductSuggestion({ product }: { product: SearchProduct }) {
     return (
         <div className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer">
             {/* Product Image */}
-            <div className="flex-shrink-0 w-12 h-12 bg-gray-100 rounded-lg overflow-hidden relative">
+            <div className="shrink-0 w-12 h-12 bg-gray-100 rounded-lg overflow-hidden relative">
                 <Image
                     src={product.image}
                     alt={product.name}
@@ -220,7 +230,7 @@ function ProductSuggestion({ product }: { product: SearchProduct }) {
             </div>
 
             {/* Price */}
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
                 <p className="text-sm font-semibold text-gray-900">₹{product.price.toFixed(2)}</p>
             </div>
         </div>

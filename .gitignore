@@ -1,6 +1,7 @@
 # Dependencies
 **/node_modules/
 **/bower_components/
+.agent/
 
 # Build output
 **/dist/

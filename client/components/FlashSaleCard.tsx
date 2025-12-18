@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -94,9 +95,11 @@ export function FlashSaleCard() {
                                 </div>
 
                                 {/* CTA Button */}
-                                <Button className="bg-white text-red-500 hover:bg-white/90 font-bold text-lg px-8 py-6 w-fit rounded-lg shadow-lg">
-                                    Shop Flash Sale
-                                </Button>
+                                <Link href="/offers/flash-sale">
+                                    <Button className="bg-white text-red-500 hover:bg-white/90 font-bold text-lg px-8 py-6 w-fit rounded-lg shadow-lg">
+                                        Shop Flash Sale
+                                    </Button>
+                                </Link>
                             </div>
 
                             {/* Right Side - Product Image */}
