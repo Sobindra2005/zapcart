@@ -14,6 +14,9 @@ export const metadata: Metadata = {
   description: "Zapcart Ecommerce Admin Dashboard",
 };
 
+import { SidebarProvider } from "@/lib/SidebarContext";
+import { LayoutWrapper } from "@/components/LayoutWrapper";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,12 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} font-sans antialiased bg-background`}>
-        <Sidebar />
-        <div className="pl-64 flex flex-col min-h-screen">
-          <main className="flex-1">
+        <SidebarProvider>
+          <LayoutWrapper>
             {children}
-          </main>
-        </div>
+          </LayoutWrapper>
+        </SidebarProvider>
       </body>
     </html>
   );
