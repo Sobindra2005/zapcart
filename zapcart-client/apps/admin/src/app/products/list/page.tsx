@@ -5,9 +5,20 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Input } from "@repo/ui/ui/input";
+import { SortSelect, SortOption } from "@repo/ui/SortSelect";
+
+const sortOptions: SortOption[] = [
+  { value: "newest", label: "Newest" },
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "stock-low", label: "Stock: Low to High" },
+];
 
 const products = [
   {
@@ -98,24 +109,54 @@ const getStatusStyles = (status: string) => {
 };
 
 export default function ProductListPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState<string>("newest");
+
   return (
     <div className="p-8">
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
         {/* Table Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900">Products list</h2>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between px-6 py-5 gap-4 border-b border-gray-100">
+          <div className="flex items-center gap-4 flex-1">
+            <h2 className="text-xl font-bold text-gray-900 whitespace-nowrap">Products list</h2>
+
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 max-w-md hidden lg:block">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 z-10 " />
+              <Input
+                type="search"
+                placeholder="Search products..."
+                className="pl-10 bg-gray-50 border-gray-200 transition-all w-full focus-visible:outline-1  focus-visible:border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="h-6 w-px bg-gray-200 mx-1 hidden sm:block" />
+
             <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
               <Filter className="h-4 w-4" />
               Filter
-            </button>
-            <button className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-100 transition-colors">
-              See All
             </button>
             <button className="flex items-center gap-2 px-4 py-1.5 text-sm font-bold text-white bg-primary rounded-lg hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
               <Plus className="h-4 w-4" strokeWidth={3} />
               Add Product
             </button>
+          </div>
+        </div>
+
+        {/* Mobile Search - Visible only on small screens */}
+        <div className="px-6 py-3 border-b border-gray-100 lg:hidden">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 z-10" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              className="pl-10 bg-gray-50 border-gray-200 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
 

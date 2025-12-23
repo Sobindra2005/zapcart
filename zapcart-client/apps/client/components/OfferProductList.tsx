@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Product } from "@/types/product";
 import { ProductCard } from "@/components/ProductCard";
 import { MainContainer } from "./wrapper";
-import { SortSelect, SortOption } from "@/components/SortSelect";
+import { SortSelect, SortOption } from "@repo/ui/SortSelect";
 
 // Custom sort options for offers page
 const offerSortOptions: SortOption[] = [
