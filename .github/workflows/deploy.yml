@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./client
+        working-directory: ./zapcart-client
 
     steps:
       - name: Checkout code
@@ -76,7 +76,7 @@ jobs:
 
       - name: Build Client Docker image
         run: |
-          docker build -t zapcart-client:dev ./client
+          docker build -t zapcart-client:dev ./zapcart-client
 
       - name: Build Nginx Docker image
         run: |
