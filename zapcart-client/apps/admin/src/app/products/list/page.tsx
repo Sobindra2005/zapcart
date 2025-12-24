@@ -103,6 +103,16 @@ const initialProducts: Product[] = [
   },
 ];
 
+function SortIcon({ columnKey, sortConfig }: { columnKey: keyof Product; sortConfig: SortConfig }) {
+  const isActive = sortConfig.key === columnKey;
+  if (!isActive || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />;
+  return sortConfig.direction === "asc" ? (
+    <ArrowUp className="h-4 w-4 text-primary" />
+  ) : (
+    <ArrowDown className="h-4 w-4 text-primary" />
+  );
+}
+
 const getStatusStyles = (status: string) => {
   switch (status) {
     case "Active":
@@ -185,16 +195,7 @@ export default function ProductListPage() {
   };
 
 
-// Move SortIcon outside the main component
-function SortIcon({ columnKey, sortConfig }: { columnKey: keyof Product; sortConfig: SortConfig }) {
-  const isActive = sortConfig.key === columnKey;
-  if (!isActive || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />;
-  return sortConfig.direction === "asc" ? (
-    <ArrowUp className="h-4 w-4 text-primary" />
-  ) : (
-    <ArrowDown className="h-4 w-4 text-primary" />
-  );
-}
+
 
   return (
     <div className="p-8">
