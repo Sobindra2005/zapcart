@@ -35,10 +35,6 @@ import {
 import {
     BarChart,
     Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
     ResponsiveContainer,
     Cell
 } from "recharts";
@@ -211,7 +207,7 @@ const CategoryRow = ({
                 </div>
 
                 <div style={{ paddingLeft: `${depth * 28}px` }} className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 min-w-[24px]">
+                    <div className="flex items-center gap-1.5 min-w-6">
                         {hasChildren && (
                             <button
                                 onClick={(e) => {
@@ -237,12 +233,12 @@ const CategoryRow = ({
                     </div>
                 </div>
 
-                <div className="hidden md:flex flex-col items-end px-6 min-w-[120px]">
+                <div className="hidden md:flex flex-col items-end px-6 min-w-30">
                     <span className="text-sm font-bold text-gray-900">{category.productCount}</span>
                     <span className="text-[10px] text-gray-500 uppercase tracking-wider font-semibold">Products</span>
                 </div>
 
-                <div className="hidden lg:flex px-6 min-w-[140px] items-center gap-2">
+                <div className="hidden lg:flex px-6 min-w-35 items-center gap-2">
                     <div className="h-1.5 w-24 bg-gray-100 rounded-full overflow-hidden">
                         <div
                             className={cn(
@@ -255,7 +251,7 @@ const CategoryRow = ({
                     <span className="text-xs font-bold text-gray-600">{category.health}%</span>
                 </div>
 
-                <div className="px-4 min-w-[100px]">
+                <div className="px-4 min-w-25">
                     <StatusBadge status={category.status} />
                 </div>
 
@@ -430,9 +426,9 @@ export default function CategoriesPage() {
                                 <div className="w-4"></div>
                             </div>
                             <div className="flex-1">Category & Hierarchy</div>
-                            <div className="hidden md:block w-[120px] text-right px-6">Product Count</div>
-                            <div className="hidden lg:block w-[140px] px-6">Market Health</div>
-                            <div className="w-[100px] px-4">Status</div>
+                            <div className="hidden md:block w-30 text-right px-6">Product Count</div>
+                            <div className="hidden lg:block w-35 px-6">Market Health</div>
+                            <div className="w-25 px-4">Status</div>
                             <div className="w-20 text-right">Actions</div>
                         </div>
                         <div className="divide-y divide-gray-100">
@@ -454,7 +450,7 @@ export default function CategoriesPage() {
 
                 {/* Details Panel */}
                 {selectedCategory && (
-                    <Card className="w-full lg:w-[400px] shadow-sm border-gray-200 sticky top-8">
+                    <Card className="w-full g:w-100 shadow-sm border-gray-200 sticky top-8">
                         <CardHeader className="border-b border-gray-100 pb-4">
                             <div className="flex items-center justify-between mb-2">
                                 <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20">

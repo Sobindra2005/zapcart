@@ -4,7 +4,6 @@ import { useState, useMemo } from "react";
 import {
     Search,
     ArrowUpDown,
-    MoreVertical,
     Edit,
     Trash2,
     ChevronLeft,
@@ -190,15 +189,6 @@ export default function CustomerListingPage() {
         );
     };
 
-    const SortIcon = ({ columnKey }: { columnKey: keyof Customer }) => {
-        const isActive = sortConfig.key === columnKey;
-        if (!isActive || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
-        return sortConfig.direction === "asc" ? (
-            <ArrowUp className="h-4 w-4 text-primary" />
-        ) : (
-            <ArrowDown className="h-4 w-4 text-primary" />
-        );
-    };
 
     return (
         <div className="p-8">
@@ -247,7 +237,7 @@ export default function CustomerListingPage() {
                                 >
                                     <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                                         Name
-                                        <SortIcon columnKey="name" />
+                                        <SortIcon columnKey="name" sortConfig={sortConfig} />
                                     </div>
                                 </th>
                                 <th
@@ -256,7 +246,7 @@ export default function CustomerListingPage() {
                                 >
                                     <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                                         Email
-                                        <SortIcon columnKey="email" />
+                                        <SortIcon columnKey="email" sortConfig={sortConfig} />
                                     </div>
                                 </th>
                                 <th
@@ -265,7 +255,7 @@ export default function CustomerListingPage() {
                                 >
                                     <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                                         Phone
-                                        <SortIcon columnKey="phone" />
+                                        <SortIcon columnKey="phone" sortConfig={sortConfig} />
                                     </div>
                                 </th>
                                 <th
@@ -274,7 +264,7 @@ export default function CustomerListingPage() {
                                 >
                                     <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                                         Country
-                                        <SortIcon columnKey="country" />
+                                        <SortIcon columnKey="country" sortConfig={sortConfig} />
                                     </div>
                                 </th>
                                 <th
@@ -283,7 +273,7 @@ export default function CustomerListingPage() {
                                 >
                                     <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                                         Spent
-                                        <SortIcon columnKey="spent" />
+                                        <SortIcon columnKey="spent" sortConfig={sortConfig} />
                                     </div>
                                 </th>
                                 <th
@@ -292,7 +282,7 @@ export default function CustomerListingPage() {
                                 >
                                     <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                                         Status
-                                        <SortIcon columnKey="status" />
+                                        <SortIcon columnKey="status" sortConfig={sortConfig} />
                                     </div>
                                 </th>
                                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Action</th>
@@ -317,7 +307,7 @@ export default function CustomerListingPage() {
                                     </td>
                                     <td className="px-3 py-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                                            <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden shrink-0 border border-gray-200">
                                                 <Image
                                                     src={customer.avatar}
                                                     alt={customer.name}
@@ -392,5 +382,15 @@ export default function CustomerListingPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function SortIcon({ columnKey, sortConfig }: { columnKey: keyof Customer; sortConfig: SortConfig }) {
+    const isActive = sortConfig.key === columnKey;
+    if (!isActive || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
+    return sortConfig.direction === "asc" ? (
+        <ArrowUp className="h-4 w-4 text-primary" />
+    ) : (
+        <ArrowDown className="h-4 w-4 text-primary" />
     );
 }

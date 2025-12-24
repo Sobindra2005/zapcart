@@ -13,16 +13,13 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { Input } from "@repo/ui/ui/input";
 import { Button } from "@repo/ui/ui/button";
-import { Badge } from "@repo/ui/ui/badge";
 import {
     Card,
     CardContent,
     CardHeader,
     CardTitle,
-    CardDescription
 } from "@repo/ui/ui/card";
 
 interface FeaturedProduct {
@@ -70,8 +67,6 @@ const mockFeaturedProducts: FeaturedProduct[] = [
 ];
 
 export default function FeaturedProductsPage() {
-    const [searchQuery, setSearchQuery] = useState("");
-
     return (
         <div className="p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
@@ -102,7 +97,7 @@ export default function FeaturedProductsPage() {
                         <span className="text-[10px] font-bold text-gray-500">8 / 12 slots used</span>
                     </div>
 
-                    {mockFeaturedProducts.filter(p => p.selected).map((product, index) => (
+                    {mockFeaturedProducts.filter(p => p.selected).map((product) => (
                         <div key={product.id} className="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-4 group hover:border-primary/50 transition-colors shadow-sm">
                             <GripVertical className="h-4 w-4 text-gray-300 cursor-grab active:cursor-grabbing" />
                             <div className="h-12 w-12 rounded-lg bg-gray-50 overflow-hidden shrink-0 border border-gray-100">

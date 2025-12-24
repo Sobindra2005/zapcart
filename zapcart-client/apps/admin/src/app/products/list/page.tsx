@@ -184,15 +184,17 @@ export default function ProductListPage() {
     );
   };
 
-  const SortIcon = ({ columnKey }: { columnKey: keyof Product }) => {
-    const isActive = sortConfig.key === columnKey;
-    if (!isActive || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />;
-    return sortConfig.direction === "asc" ? (
-      <ArrowUp className="h-4 w-4 text-primary" />
-    ) : (
-      <ArrowDown className="h-4 w-4 text-primary" />
-    );
-  };
+
+// Move SortIcon outside the main component
+function SortIcon({ columnKey, sortConfig }: { columnKey: keyof Product; sortConfig: SortConfig }) {
+  const isActive = sortConfig.key === columnKey;
+  if (!isActive || !sortConfig.direction) return <ArrowUpDown className="h-4 w-4 text-gray-400 group-hover:text-gray-600" />;
+  return sortConfig.direction === "asc" ? (
+    <ArrowUp className="h-4 w-4 text-primary" />
+  ) : (
+    <ArrowDown className="h-4 w-4 text-primary" />
+  );
+}
 
   return (
     <div className="p-8">
@@ -269,7 +271,7 @@ export default function ProductListPage() {
                 >
                   <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                     Product Name
-                    <SortIcon columnKey="name" />
+                    <SortIcon columnKey="name" sortConfig={sortConfig} />
                   </div>
                 </th>
                 <th
@@ -278,7 +280,7 @@ export default function ProductListPage() {
                 >
                   <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                     Category
-                    <SortIcon columnKey="category" />
+                    <SortIcon columnKey="category" sortConfig={sortConfig} />
                   </div>
                 </th>
                 <th
@@ -287,7 +289,7 @@ export default function ProductListPage() {
                 >
                   <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                     Price
-                    <SortIcon columnKey="price" />
+                    <SortIcon columnKey="price" sortConfig={sortConfig} />
                   </div>
                 </th>
                 <th
@@ -296,7 +298,7 @@ export default function ProductListPage() {
                 >
                   <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                     Stock
-                    <SortIcon columnKey="stock" />
+                    <SortIcon columnKey="stock" sortConfig={sortConfig} />
                   </div>
                 </th>
                 <th
@@ -305,7 +307,7 @@ export default function ProductListPage() {
                 >
                   <div className="flex items-center gap-1.5 hover:text-gray-900 transition-colors">
                     Status
-                    <SortIcon columnKey="status" />
+                    <SortIcon columnKey="status" sortConfig={sortConfig} />
                   </div>
                 </th>
                 <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Action</th>
@@ -330,7 +332,7 @@ export default function ProductListPage() {
                   </td>
                   <td className="px-3 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
+                      <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200">
                         <Image
                           src={product.image}
                           alt={product.name}

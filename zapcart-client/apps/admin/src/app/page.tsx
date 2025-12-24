@@ -109,7 +109,7 @@ export default function DashboardPage() {
                             </button>
                         </div>
                     </div>
-                    <div className="h-[300px] w-full">
+                    <div className="h-75 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <defs>
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                         </button>
                     </div>
                     <div className="flex-1 flex flex-col items-center justify-center p-4">
-                        <div className="h-[240px] w-full">
+                        <div className="h-60 w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
@@ -232,7 +232,7 @@ export default function DashboardPage() {
                                         </td>
                                         <td className="py-4 px-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                                                <div className="h-10 w-10 rounded-lg bg-gray-100 overflow-hidden shrink-0">
                                                     <Image
                                                         src={product.image}
                                                         alt={product.name}
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="mt-8 text-center">
                             <p className="text-sm font-medium text-gray-500 line-clamp-2 px-4 italic">
-                                "Target you've set for each month"
+                                &quot;Target you&apos;ve set for each month&quot;
                             </p>
                             <button className="mt-6 px-6 py-2 bg-gray-50 text-gray-600 text-sm font-bold rounded-xl hover:bg-gray-100 transition-all border border-gray-100">
                                 Manage Target

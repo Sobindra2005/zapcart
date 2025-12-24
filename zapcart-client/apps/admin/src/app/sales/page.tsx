@@ -3,7 +3,6 @@
 import {
     DollarSign,
     ShoppingBag,
-    Users,
     ArrowUpRight,
     ArrowDownRight,
     Search,
@@ -11,15 +10,11 @@ import {
     Download,
     MoreHorizontal,
     TrendingUp,
-    Globe,
-    CreditCard,
     AlertCircle,
     Calendar,
     ChevronRight,
-    ExternalLink,
     Zap
 } from "lucide-react";
-import { useState, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@repo/ui/ui/input";
 import { Button } from "@repo/ui/ui/button";
@@ -45,8 +40,6 @@ import {
     PieChart,
     Pie
 } from "recharts";
-
-// --- Mock Data ---
 
 const kpiData = [
     { title: "Total Sales", value: "$124,592.00", trend: "+12.5%", icon: DollarSign, color: "text-blue-600", bg: "bg-blue-50" },
@@ -87,8 +80,6 @@ const recentOrders = [
     { id: "ORD-7389", customer: "Rahul Gupta", date: "2024-03-22", amount: "$210.00", status: "Refunded", items: 2 },
     { id: "ORD-7388", customer: "Pooja Rai", date: "2024-03-21", amount: "$56.00", status: "Paid", items: 1 },
 ];
-
-// --- Sub-components ---
 
 const KPICard = ({ item }: { item: typeof kpiData[0] }) => (
     <Card className="shadow-sm border-gray-200">
@@ -240,40 +231,48 @@ const PredictiveSales = () => (
     </Card>
 );
 
-const CohortAnalysis = () => (
-    <Card className="shadow-sm border-gray-200">
-        <CardHeader className="pb-4">
-            <CardTitle className="text-sm font-bold">Retention Cohort</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <div className="grid grid-cols-5 gap-1">
-                {Array.from({ length: 25 }).map((_, i) => {
-                    const intensity = Math.floor(Math.random() * 4);
-                    const opacity = [0.1, 0.3, 0.6, 0.9][intensity];
-                    return (
+import React, { useMemo } from "react";
+
+const CohortAnalysis = () => {
+    const cohortOpacities = useMemo(
+        () =>
+            Array.from({ length: 25 }).map(
+                () => [0.1, 0.3, 0.6, 0.9][Math.floor(Math.random() * 4)]
+            ),
+        []
+    );
+
+    return (
+        <Card className="shadow-sm border-gray-200">
+            <CardHeader className="pb-4">
+                <CardTitle className="text-sm font-bold">Retention Cohort</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-5 gap-1">
+                    {cohortOpacities.map((opacity, i) => (
                         <div
                             key={i}
-                            className="aspect-square rounded-[4px] relative group"
+                            className="aspect-square rounded-sm relative group"
                             style={{ backgroundColor: `rgba(59, 130, 246, ${opacity})` }}
                         >
                             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <span className="text-[8px] font-black text-white">{Math.floor(opacity * 100)}%</span>
                             </div>
                         </div>
-                    );
-                })}
-            </div>
-            <div className="flex justify-between mt-3 text-[10px] font-bold text-gray-400 uppercase">
-                <span>Month 1</span>
-                <span>Month 5</span>
-            </div>
-        </CardContent>
-    </Card>
-);
+                    ))}
+                </div>
+                <div className="flex justify-between mt-3 text-[10px] font-bold text-gray-400 uppercase">
+                    <span>Month 1</span>
+                    <span>Month 5</span>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
 
 export default function SalesPage() {
     return (
-        <div className="p-8 max-w-[1600px] mx-auto space-y-8">
+        <div className="p-8 max-w-400 mx-auto space-y-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
@@ -312,7 +311,7 @@ export default function SalesPage() {
                             </div>
                         </div>
                     </CardHeader>
-                    <CardContent className="h-[350px]">
+                    <CardContent className="h-87.5">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={salesTrendData}>
                                 <defs>
@@ -377,7 +376,7 @@ export default function SalesPage() {
                         <CardHeader>
                             <CardTitle className="text-sm font-bold">Best Selling Products</CardTitle>
                         </CardHeader>
-                        <CardContent className="h-[250px] p-0 px-6">
+                        <CardContent className="h-87.5 p-0 px-6">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={topProductsData} layout="vertical">
                                     <XAxis type="number" hide />
@@ -402,7 +401,7 @@ export default function SalesPage() {
                             <CardTitle className="text-sm font-bold">Sales by Channel</CardTitle>
                         </CardHeader>
                         <CardContent className="flex items-center justify-between pt-0">
-                            <div className="h-[120px] w-[120px]">
+                            <div className="h-30 w-30">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie

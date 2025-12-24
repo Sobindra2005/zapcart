@@ -1,27 +1,16 @@
 "use client";
 
 import {
-    Users,
     MousePointer2,
-    ShoppingBag,
     TrendingUp,
     Smartphone,
-    Monitor,
-    Globe,
     Zap,
     AlertTriangle,
     Sparkles,
     Calendar,
-    Download,
-    Filter,
-    ArrowUpRight,
-    ArrowDownRight,
-    Search,
-    ChevronRight,
     Activity,
     Target
 } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@repo/ui/ui/button";
 import { Badge } from "@repo/ui/ui/badge";
@@ -103,7 +92,7 @@ const TrafficChart = () => (
                 </div>
             </div>
         </CardHeader>
-        <CardContent className="h-[300px]">
+        <CardContent className="h-75">
             <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trafficData}>
                     <defs>
@@ -228,7 +217,7 @@ const RetentionHeatmap = () => (
 
 export default function AnalyticsPage() {
     return (
-        <div className="p-8 max-w-[1600px] mx-auto space-y-8">
+        <div className="p-8 max-w-400 mx-auto space-y-8">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-baseline sm:items-center justify-between gap-6">
                 <div>
@@ -306,7 +295,7 @@ export default function AnalyticsPage() {
                                 <CardTitle className="text-base font-bold">Session by Device</CardTitle>
                             </CardHeader>
                             <CardContent className="flex items-center pt-0">
-                                <div className="h-[200px] w-1/2">
+                                <div className="h-50 w-1/2">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
@@ -353,7 +342,7 @@ export default function AnalyticsPage() {
                             <CardTitle className="text-lg font-bold">Performance Matrix</CardTitle>
                             <CardDescription>Correlation between Price (X) and Views (Y). Bubble size = Conversion Rate.</CardDescription>
                         </CardHeader>
-                        <CardContent className="h-[300px]">
+                        <CardContent className="h-75">
                             <ResponsiveContainer width="100%" height="100%">
                                 <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />

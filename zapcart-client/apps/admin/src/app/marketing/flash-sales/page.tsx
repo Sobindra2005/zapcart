@@ -8,10 +8,8 @@ import {
     Clock,
     Zap,
     TrendingUp,
-    MoreVertical,
     BarChart3,
     ArrowUpRight,
-    ArrowDownRight,
     Edit,
     Trash2,
     Eye,
@@ -119,7 +117,7 @@ export default function FlashSalesPage() {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <Card className="shadow-sm border-gray-200 bg-gradient-to-br from-white to-gray-50/50">
+                <Card className="shadow-sm border-gray-200 bg-linear-to-br from-white to-gray-50/50">
                     <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold text-gray-400 uppercase tracking-wider">Active Campaigns</CardTitle>
@@ -253,7 +251,7 @@ export default function FlashSalesPage() {
                                                 {new Date(sale.startTime).toLocaleDateString()}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden min-w-[100px]">
+                                                <div className="h-1.5 flex-1 bg-gray-100 rounded-full overflow-hidden min-w-25">
                                                     <div
                                                         className={cn(
                                                             "h-full rounded-full",
@@ -310,7 +308,7 @@ export default function FlashSalesPage() {
                             <Timer className="h-8 w-8 text-gray-300" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-1">Queue Management</h3>
-                        <p className="text-sm text-gray-500 text-center max-w-[280px]">Automate your sale starts and ends with precision scheduling.</p>
+                        <p className="text-sm text-gray-500 text-center max-w-70">Automate your sale starts and ends with precision scheduling.</p>
                         <Button variant="link" className="mt-4 font-bold text-primary">Learn more</Button>
                     </CardContent>
                 </Card>
@@ -321,7 +319,7 @@ export default function FlashSalesPage() {
                             <Zap className="h-8 w-8 text-gray-300" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900 mb-1">Smart Discounts</h3>
-                        <p className="text-sm text-gray-500 text-center max-w-[280px]">Apply dynamic discounts based on stock levels and demand.</p>
+                        <p className="text-sm text-gray-500 text-center max-w-70">Apply dynamic discounts based on stock levels and demand.</p>
                         <Button variant="link" className="mt-4 font-bold text-primary">Coming soon</Button>
                     </CardContent>
                 </Card>
