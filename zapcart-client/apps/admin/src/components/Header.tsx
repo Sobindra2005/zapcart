@@ -1,29 +1,16 @@
 "use client";
 
-import { Search, Bell, ChevronDown, Menu } from "lucide-react";
+import { Search, Bell, ChevronDown } from "lucide-react";
 import Image from "next/image";
-import { useSidebar } from "@/lib/SidebarContext";
-import { cn } from "@/lib/utils";
 
 interface HeaderProps {
     title: string;
 }
 
 export function Header({ title }: HeaderProps) {
-    const { toggleSidebar, isCollapsed } = useSidebar();
-
     return (
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-gray-200 bg-white/80 backdrop-blur-md px-8">
-            <div className="flex items-center gap-4">
-                <button
-                    onClick={toggleSidebar}
-                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                    title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                >
-                    <Menu className="h-5 w-5" />
-                </button>
-                <h1 className="text-xl font-bold text-gray-900">{title}</h1>
-            </div>
+            <h1 className="text-xl font-bold text-gray-900">{title}</h1>
 
             <div className="flex items-center gap-6">
                 {/* Search */}

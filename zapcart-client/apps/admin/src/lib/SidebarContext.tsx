@@ -10,16 +10,17 @@ interface SidebarContextType {
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export function SidebarProvider({ children }: { children: React.ReactNode }) {
-    const [isCollapsed, setIsCollapsed] = useState(false);
 
-    // Load state from localStorage on mount
-    useEffect(() => {
-        const saved = localStorage.getItem("sidebar-collapsed");
-        if (saved !== null) {
-            setIsCollapsed(saved === "true");
+export function SidebarProvider({ children }: { children: React.ReactNode }) {
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("sidebar-collapsed");
+            if (saved !== null) {
+                return saved === "true";
+            }
         }
-    }, []);
+        return false;
+    });
 
     const toggleSidebar = () => {
         setIsCollapsed((prev) => {

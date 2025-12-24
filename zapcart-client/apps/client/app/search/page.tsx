@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { mockProducts } from "@/data/mockSearchData";
 import { Button } from "@repo/ui/ui/button";
 import { Filter } from "lucide-react";
-import { SortSelect, productSortOptions } from "@/components/SortSelect";
+import { SortSelect, productSortOptions } from "@repo/ui/SortSelect";
 
 export default function SearchPage() {
     const [filters, setFilters] = useState({
