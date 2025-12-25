@@ -28,6 +28,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@repo/ui/ui/card";
+import { AdminCard } from "@/components/AdminCard";
 
 interface FlashSale {
     id: string;
@@ -94,7 +95,7 @@ export default function FlashSalesPage() {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-8 space-y-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-end gap-4 mb-8">
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <Button variant="outline" className="flex-1 md:flex-none gap-2 font-bold border-gray-200 bg-white shadow-sm">
@@ -110,7 +111,7 @@ export default function FlashSalesPage() {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <Card className="shadow-sm border-gray-200 bg-linear-to-br from-white to-gray-50/50">
+                <AdminCard className="px-0 bg-linear-to-br from-white to-gray-50/50">
                     <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold text-gray-400 uppercase tracking-wider">Active Campaigns</CardTitle>
@@ -129,9 +130,9 @@ export default function FlashSalesPage() {
                             </div>
                         </div>
                     </CardContent>
-                </Card>
+                </AdminCard>
 
-                <Card className="shadow-sm border-gray-200">
+                <AdminCard className="px-0">
                     <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold text-gray-400 uppercase tracking-wider">Avg. Conversion Rate</CardTitle>
@@ -150,9 +151,9 @@ export default function FlashSalesPage() {
                             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">vs Last 30 Days</div>
                         </div>
                     </CardContent>
-                </Card>
+                </AdminCard>
 
-                <Card className="shadow-sm border-gray-200">
+                <AdminCard className="px-0">
                     <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold text-gray-400 uppercase tracking-wider">Items Sold Flash</CardTitle>
@@ -170,11 +171,11 @@ export default function FlashSalesPage() {
                             </div>
                         </div>
                     </CardContent>
-                </Card>
+                </AdminCard>
             </div>
 
             {/* Campaign List */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+            <AdminCard className="p-0 ">
                 <div className="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="relative w-full sm:max-w-xs">
                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -291,7 +292,7 @@ export default function FlashSalesPage() {
                         <Button variant="outline" size="sm" className="h-8 px-3 font-bold text-gray-500 border-gray-200" disabled>Next</Button>
                     </div>
                 </div>
-            </div>
+            </AdminCard>
 
             {/* Empty State Mockup Strategy */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

@@ -8,7 +8,6 @@ import {
     AlertTriangle,
     Sparkles,
     Calendar,
-    Activity,
     Target
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,6 +35,7 @@ import {
     Scatter,
     ZAxis
 } from "recharts";
+import { AdminCard } from "@/components/AdminCard";
 
 // --- Mock Data ---
 
@@ -73,7 +73,7 @@ const performanceScatterData = [
 ];
 
 const TrafficChart = () => (
-    <Card className="shadow-sm border-gray-200">
+    <AdminCard className="px-0">
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
                 <CardTitle className="text-lg font-bold">Traffic Source Breakdown</CardTitle>
@@ -110,7 +110,7 @@ const TrafficChart = () => (
                 </AreaChart>
             </ResponsiveContainer>
         </CardContent>
-    </Card>
+    </AdminCard>
 );
 
 const FunnelStep = ({ step, max }: { step: typeof funnelData[0], max: number }) => {
@@ -139,7 +139,7 @@ const FunnelStep = ({ step, max }: { step: typeof funnelData[0], max: number }) 
 };
 
 const AnomalyAlert = () => (
-    <div className="p-4 rounded-xl border border-red-100 bg-red-50/50 flex items-start gap-4">
+    <AdminCard className=" bg-red-50/50 flex items-start gap-4 ">
         <div className="p-2 rounded-lg bg-red-100">
             <AlertTriangle className="h-5 w-5 text-red-600" />
         </div>
@@ -153,11 +153,11 @@ const AnomalyAlert = () => (
                 <Button variant="ghost" size="sm" className="h-7 text-[10px] font-black uppercase text-red-400">Dismiss</Button>
             </div>
         </div>
-    </div>
+    </AdminCard>
 );
 
 const AIInsightsPanel = () => (
-    <Card className="shadow-sm border-indigo-200 bg-indigo-50/10 h-full">
+    <AdminCard className="shadow-sm border-indigo-200 bg-indigo-50/10 h-full px-0">
         <CardHeader className="pb-3 flex flex-row items-center justify-between border-b border-indigo-50">
             <CardTitle className="text-sm font-bold flex items-center gap-2 text-indigo-900">
                 <Sparkles className="h-4 w-4 text-indigo-500" />
@@ -182,7 +182,7 @@ const AIInsightsPanel = () => (
                 Generate Full Report
             </Button>
         </CardContent>
-    </Card>
+    </AdminCard>
 );
 
 const RetentionHeatmap = () => (
@@ -237,7 +237,7 @@ export default function AnalyticsPage() {
                             { label: "Bounce Rate", value: "24.1%", trend: "-2.4%", icon: MousePointer2, color: "text-green-600", bg: "bg-green-50" },
                             { label: "Avg. Session", value: "4m 12s", trend: "+12s", icon: Zap, color: "text-purple-600", bg: "bg-purple-50" },
                         ].map((m, i) => (
-                            <Card key={i} className="shadow-sm border-gray-200 hover:border-primary/20 transition-colors">
+                            <AdminCard key={i} className="p-3 hover:border-primary/20 transition-colors">
                                 <CardContent className="pt-6">
                                     <div className="flex justify-between items-start">
                                         <div className={cn("p-2 rounded-xl", m.bg)}>
@@ -250,7 +250,7 @@ export default function AnalyticsPage() {
                                     <h3 className="text-sm font-bold text-gray-500 mt-4">{m.label}</h3>
                                     <p className="text-2xl font-black text-gray-900">{m.value}</p>
                                 </CardContent>
-                            </Card>
+                            </AdminCard>
                         ))}
                     </div>
                     <AnomalyAlert />
@@ -263,7 +263,7 @@ export default function AnalyticsPage() {
             {/* Bottom Grid - Behavioral Analytics */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Conversion Funnel */}
-                <Card className="shadow-sm border-gray-200">
+                <AdminCard className="px-0">
                     <CardHeader>
                         <CardTitle className="text-lg font-bold">Conversion Funnel</CardTitle>
                         <CardDescription>Visualizing the path from session to purchase.</CardDescription>
@@ -273,13 +273,13 @@ export default function AnalyticsPage() {
                             <FunnelStep key={step.stage} step={step} max={funnelData[0].count} />
                         ))}
                     </CardContent>
-                </Card>
+                </AdminCard>
 
                 {/* Device & Correlation */}
                 <div className="lg:col-span-2 space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Device Breakdown */}
-                        <Card className="shadow-sm border-gray-200">
+                        <AdminCard className="px-0 ">
                             <CardHeader className="pb-0">
                                 <CardTitle className="text-base font-bold">Session by Device</CardTitle>
                             </CardHeader>
@@ -315,18 +315,18 @@ export default function AnalyticsPage() {
                                     ))}
                                 </div>
                             </CardContent>
-                        </Card>
+                        </AdminCard>
 
                         {/* Retention */}
-                        <Card className="shadow-sm border-gray-200 h-full">
+                        <AdminCard className="p-0 h-full">
                             <CardContent className="pt-6">
                                 <RetentionHeatmap />
                             </CardContent>
-                        </Card>
+                        </AdminCard>
                     </div>
 
                     {/* Product Performance Correlation */}
-                    <Card className="shadow-sm border-gray-200">
+                    <AdminCard className="px-0">
                         <CardHeader>
                             <CardTitle className="text-lg font-bold">Performance Matrix</CardTitle>
                             <CardDescription>Correlation between Price (X) and Views (Y). Bubble size = Conversion Rate.</CardDescription>
@@ -343,7 +343,7 @@ export default function AnalyticsPage() {
                                 </ScatterChart>
                             </ResponsiveContainer>
                         </CardContent>
-                    </Card>
+                    </AdminCard>
                 </div>
             </div>
         </div>

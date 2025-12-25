@@ -40,6 +40,7 @@ import {
     PieChart,
     Pie
 } from "recharts";
+import { AdminCard } from "@/components/AdminCard";
 
 const kpiData = [
     { title: "Total Sales", value: "$124,592.00", trend: "+12.5%", icon: DollarSign, color: "text-blue-600", bg: "bg-blue-50" },
@@ -82,7 +83,7 @@ const recentOrders = [
 ];
 
 const KPICard = ({ item }: { item: typeof kpiData[0] }) => (
-    <Card className="shadow-sm border-gray-200">
+    <AdminCard className="px-0">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-gray-500">{item.title}</CardTitle>
             <div className={cn("p-2 rounded-lg", item.bg)}>
@@ -99,7 +100,7 @@ const KPICard = ({ item }: { item: typeof kpiData[0] }) => (
                 {item.trend} <span className="text-gray-400 font-normal">vs last month</span>
             </p>
         </CardContent>
-    </Card>
+    </AdminCard>
 );
 
 const OrdersTable = () => {
@@ -113,7 +114,7 @@ const OrdersTable = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <AdminCard className="p-0">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -166,12 +167,12 @@ const OrdersTable = () => {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </AdminCard>
     );
 };
 
 const RealTimeTicker = () => (
-    <Card className="shadow-sm border-gray-200 overflow-hidden">
+    <AdminCard className="p-2 px-0">
         <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-bold flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
@@ -195,11 +196,11 @@ const RealTimeTicker = () => (
                 ))}
             </div>
         </CardContent>
-    </Card>
+    </AdminCard>
 );
 
 const PredictiveSales = () => (
-    <Card className="shadow-sm border-gray-200">
+    <AdminCard className="p-2">
         <CardHeader className="pb-2">
             <CardTitle className="text-sm font-bold flex items-center gap-2">
                 <TrendingUp className="h-4 w-4 text-primary" />
@@ -228,43 +229,50 @@ const PredictiveSales = () => (
                 </div>
             </div>
         </CardContent>
-    </Card>
+    </AdminCard>
 );
 
-
-const COHORT_OPACITIES = Array.from({ length: 25 }).map(
-    () => [0.1, 0.3, 0.6, 0.9][Math.floor(Math.random() * 4)]
-);
-
-const CohortAnalysis = () => {
-    const cohortOpacities = COHORT_OPACITIES;
+const SalesByChannel = () => {
     return (
-        <Card className="shadow-sm border-gray-200">
-            <CardHeader className="pb-4">
-                <CardTitle className="text-sm font-bold">Retention Cohort</CardTitle>
+        <AdminCard className="p-2">
+            <CardHeader>
+                <CardTitle className="text-sm font-bold">Sales by Channel</CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-5 gap-1">
-                    {cohortOpacities.map((opacity, i) => (
-                        <div
-                            key={i}
-                            className="aspect-square rounded-sm relative group"
-                            style={{ backgroundColor: `rgba(59, 130, 246, ${opacity})` }}
-                        >
-                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <span className="text-[8px] font-black text-white">{Math.floor(opacity * 100)}%</span>
+            <CardContent className="flex items-center justify-between pt-0">
+                <div className="h-30 w-30">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={channelData}
+                                innerRadius={30}
+                                outerRadius={50}
+                                paddingAngle={5}
+                                dataKey="value"
+                            >
+                                {channelData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="space-y-2 flex-1 ml-6">
+                    {channelData.map((item) => (
+                        <div key={item.name} className="flex items-center justify-between text-[10px] font-bold">
+                            <div className="flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+                                <span className="text-gray-500 uppercase">{item.name}</span>
                             </div>
+                            <span className="text-gray-900">{item.value}%</span>
                         </div>
                     ))}
                 </div>
-                <div className="flex justify-between mt-3 text-[10px] font-bold text-gray-400 uppercase">
-                    <span>Month 1</span>
-                    <span>Month 5</span>
-                </div>
             </CardContent>
-        </Card>
-    );
-};
+        </AdminCard>
+    )
+}
+
+
 
 export default function SalesPage() {
     return (
@@ -290,7 +298,7 @@ export default function SalesPage() {
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Sales Trend Chart */}
-                <Card className="lg:col-span-2 shadow-sm border-gray-200">
+                <AdminCard className="lg:col-span-2 p-2">
                     <CardHeader className="pb-8">
                         <div className="flex items-center justify-between">
                             <div>
@@ -340,13 +348,13 @@ export default function SalesPage() {
                             </AreaChart>
                         </ResponsiveContainer>
                     </CardContent>
-                </Card>
+                </AdminCard>
 
                 {/* Right Sidebar Widgets */}
                 <div className="space-y-6">
                     <RealTimeTicker />
                     <PredictiveSales />
-                    <CohortAnalysis />
+                    <SalesByChannel />
                 </div>
             </div>
 
@@ -364,7 +372,7 @@ export default function SalesPage() {
                 {/* Secondary Charts */}
                 <div className="space-y-6">
                     {/* Top Products */}
-                    <Card className="shadow-sm border-gray-200">
+                    <AdminCard className="px-0">
                         <CardHeader>
                             <CardTitle className="text-sm font-bold">Best Selling Products</CardTitle>
                         </CardHeader>
@@ -385,44 +393,7 @@ export default function SalesPage() {
                                 </BarChart>
                             </ResponsiveContainer>
                         </CardContent>
-                    </Card>
-
-                    {/* Channel Breakdown */}
-                    <Card className="shadow-sm border-gray-200">
-                        <CardHeader>
-                            <CardTitle className="text-sm font-bold">Sales by Channel</CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex items-center justify-between pt-0">
-                            <div className="h-30 w-30">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={channelData}
-                                            innerRadius={30}
-                                            outerRadius={50}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                        >
-                                            {channelData.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={entry.color} />
-                                            ))}
-                                        </Pie>
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                            <div className="space-y-2 flex-1 ml-6">
-                                {channelData.map((item) => (
-                                    <div key={item.name} className="flex items-center justify-between text-[10px] font-bold">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                                            <span className="text-gray-500 uppercase">{item.name}</span>
-                                        </div>
-                                        <span className="text-gray-900">{item.value}%</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
+                    </AdminCard>
                 </div>
             </div>
         </div>

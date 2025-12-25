@@ -11,7 +11,6 @@ import {
     Save,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@repo/ui/ui/button";
 import { Badge } from "@repo/ui/ui/badge";
@@ -21,6 +20,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@repo/ui/ui/card";
+import { AdminCard } from "@/components/AdminCard";
 
 interface CarouselSlide {
     id: string;
@@ -89,7 +89,7 @@ export default function HeroCarouselPage() {
                 {/* List View */}
                 <div className="xl:col-span-2 space-y-6">
                     {slides.map((slide) => (
-                        <Card key={slide.id} className="shadow-sm border-gray-200 overflow-hidden group">
+                        <AdminCard key={slide.id} className="p-0 overflow-hidden group">
                             <div className="flex flex-col md:flex-row h-full">
                                 <div className="md:w-64 h-40 md:h-auto relative shrink-0">
                                     <Image src={slide.image} alt={slide.title} fill className="object-cover" />
@@ -128,13 +128,13 @@ export default function HeroCarouselPage() {
                                     </div>
                                 </div>
                             </div>
-                        </Card>
+                        </AdminCard>
                     ))}
                 </div>
 
                 {/* Live Preview / Tools */}
                 <div className="space-y-6">
-                    <Card className="shadow-sm border-gray-200 sticky top-8">
+                    <AdminCard className="px-0 sticky top-8">
                         <CardHeader className="pb-4 border-b border-gray-100">
                             <CardTitle className="text-sm font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
                                 <Eye className="h-4 w-4" />
@@ -163,9 +163,9 @@ export default function HeroCarouselPage() {
                             </div>
                             <p className="text-center text-[10px] font-bold text-gray-400 mt-4 uppercase tracking-widest">Real-time simulator</p>
                         </CardContent>
-                    </Card>
+                    </AdminCard>
 
-                    <Card className="shadow-sm border-gray-200">
+                    <AdminCard className="px-0">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-sm font-bold text-gray-900">Slide Settings</CardTitle>
                         </CardHeader>
@@ -188,7 +188,7 @@ export default function HeroCarouselPage() {
                                 Save Changes
                             </Button>
                         </CardContent>
-                    </Card>
+                    </AdminCard>
                 </div>
             </div>
         </div>

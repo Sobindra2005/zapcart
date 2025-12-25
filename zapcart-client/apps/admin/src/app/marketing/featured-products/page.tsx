@@ -18,6 +18,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@repo/ui/ui/card";
+import { AdminCard } from "@/components/AdminCard";
 
 interface FeaturedProduct {
     id: string;
@@ -88,7 +89,7 @@ export default function FeaturedProductsPage() {
                     </div>
 
                     {mockFeaturedProducts.filter(p => p.selected).map((product) => (
-                        <div key={product.id} className="bg-white p-4 rounded-xl border border-gray-200 flex items-center gap-4 group hover:border-primary/50 transition-colors shadow-sm">
+                        <AdminCard key={product.id} className="p-4 flex items-center gap-4 group hover:border-primary/50 transition-colors shadow-sm">
                             <GripVertical className="h-4 w-4 text-gray-300 cursor-grab active:cursor-grabbing" />
                             <div className="h-12 w-12 rounded-lg bg-gray-50 overflow-hidden shrink-0 border border-gray-100">
                                 <Image src={product.image} alt={product.name} width={48} height={48} className="object-cover" />
@@ -111,13 +112,13 @@ export default function FeaturedProductsPage() {
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Trash2 className="h-4 w-4" />
                             </Button>
-                        </div>
+                        </AdminCard>
                     ))}
                 </div>
 
                 {/* Recommendations / Performance */}
                 <div className="space-y-6">
-                    <Card className="shadow-sm border-gray-200 overflow-hidden">
+                    <AdminCard className=" px-0">
                         <CardHeader className="bg-gray-50/50 pb-4 border-b border-gray-100">
                             <CardTitle className="text-sm font-bold text-gray-900 flex items-center gap-2">
                                 <Settings className="h-4 w-4 text-gray-400" />
@@ -142,15 +143,15 @@ export default function FeaturedProductsPage() {
 
                             <Button className="w-full font-bold shadow-sm">Save Config</Button>
                         </CardContent>
-                    </Card>
+                    </AdminCard>
 
-                    <div className="bg-primary/5 rounded-2xl p-6 border border-primary/10">
+                    <AdminCard className="bg-primary/5  p-6 border border-primary/10">
                         <div className="h-10 w-10 rounded-xl bg-primary text-white flex items-center justify-center mb-4">
                             <Check className="h-6 w-6" />
                         </div>
                         <h4 className="font-black text-primary text-lg mb-1 italic">Pro Tip</h4>
                         <p className="text-xs text-primary/70 leading-relaxed font-medium">Use high-quality lifestyle images for featured products. They tend to have 40% higher CTR than plain product shots.</p>
-                    </div>
+                    </AdminCard>
                 </div>
             </div>
         </div>

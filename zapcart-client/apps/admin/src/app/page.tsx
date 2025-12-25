@@ -24,6 +24,7 @@ import {
 } from "recharts";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { AdminCard } from "@/components/AdminCard";
 
 // Mock Data for Charts
 const revenueData = [
@@ -72,7 +73,7 @@ export default function DashboardPage() {
             {/* 1. Summary Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {stats.map((stat, i) => (
-                    <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                    <AdminCard key={i} hoverable className="group">
                         <div className="flex justify-between items-start mb-4">
                             <span className="text-sm font-medium text-gray-500">{stat.label}</span>
                             <button className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -90,21 +91,21 @@ export default function DashboardPage() {
                             </div>
                             <span className="text-xs font-medium text-gray-400">{stat.vs}</span>
                         </div>
-                    </div>
+                    </AdminCard>
                 ))}
             </div>
 
             {/* 2. Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <div className="lg:col-span-8  p-6 rounded-2xl overflow-hidden shadow-sm hover:shadow-md bg-white">
+                <AdminCard hoverable className="lg:col-span-8 overflow-hidden">
                     <div className="flex justify-between items-center mb-10">
-                        <h2 className="text-lg font-bold text-white">Revenue Trend</h2>
+                        <h2 className="text-lg font-bold text-gray-900">Revenue Trend</h2>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
                                 <div className="w-3 h-3 rounded-full bg-[#10B981]" />
                                 <span className="text-xs font-medium text-gray-400">Revenue</span>
                             </div>
-                            <button className="text-gray-400 hover:text-white transition-colors">
+                            <button className="text-gray-400 hover:text-gray-600 transition-colors">
                                 <MoreHorizontal className="h-5 w-5" />
                             </button>
                         </div>
@@ -149,10 +150,10 @@ export default function DashboardPage() {
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
-                </div>
+                </AdminCard>
 
                 {/* Regional Sales Pie Chart */}
-                <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+                <AdminCard className="lg:col-span-4 flex flex-col">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-lg font-bold text-gray-900">Regional Sales</h2>
                         <button className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -189,14 +190,14 @@ export default function DashboardPage() {
                             </ResponsiveContainer>
                         </div>
                     </div>
-                </div>
+                </AdminCard>
             </div>
 
             {/* 3. Bottom Table Section */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-8">
                 {/* Product Table */}
-                <div className="lg:col-span-9 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div className="flex justify-between items-center mb-8">
+                <AdminCard noPadding className="lg:col-span-9 overflow-hidden">
+                    <div className="flex justify-between items-center px-6 pt-6 mb-8">
                         <h2 className="text-lg font-bold text-gray-900">Top Selling Products</h2>
                         <div className="flex items-center gap-3">
                             <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
@@ -258,10 +259,10 @@ export default function DashboardPage() {
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </AdminCard>
 
                 {/* Monthly Target Radial Chart */}
-                <div className="lg:col-span-3 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col">
+                <AdminCard className="lg:col-span-3 flex flex-col">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-lg font-bold text-gray-900">Monthly Target</h2>
                         <button className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -303,7 +304,7 @@ export default function DashboardPage() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </AdminCard>
             </div>
         </div>
     );

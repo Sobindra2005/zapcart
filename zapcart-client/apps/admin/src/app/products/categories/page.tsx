@@ -38,6 +38,7 @@ import {
     ResponsiveContainer,
     Cell
 } from "recharts";
+import { AdminCard } from "@/components/AdminCard";
 
 interface Category {
     id: string;
@@ -329,7 +330,7 @@ export default function CategoriesPage() {
         <div className="p-8">
             {/* Analytics Header */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <Card className="shadow-sm border-gray-200">
+                <AdminCard>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
                             <LayoutGrid className="h-4 w-4" />
@@ -345,8 +346,8 @@ export default function CategoriesPage() {
                             </span>
                         </div>
                     </CardContent>
-                </Card>
-                <Card className="shadow-sm border-gray-200">
+                </AdminCard>
+                <AdminCard>
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-medium text-gray-500 flex items-center gap-2">
                             <Activity className="h-4 w-4" />
@@ -362,8 +363,8 @@ export default function CategoriesPage() {
                             </span>
                         </div>
                     </CardContent>
-                </Card>
-                <Card className="shadow-sm border-gray-200 col-span-1 md:col-span-2">
+                </AdminCard>
+                <AdminCard className="col-span-1 md:col-span-2 ">
                     <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
                         <div>
                             <CardTitle className="text-sm font-medium text-gray-500">Sales by Category</CardTitle>
@@ -386,12 +387,12 @@ export default function CategoriesPage() {
                             </BarChart>
                         </ResponsiveContainer>
                     </CardContent>
-                </Card>
+                </AdminCard>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8 items-start">
                 {/* Main List */}
-                <div className="flex-1 w-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <AdminCard className="flex-1 w-full p-0">
                     <div className="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div className="relative w-full sm:max-w-xs">
                             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -446,11 +447,11 @@ export default function CategoriesPage() {
                             ))}
                         </div>
                     </div>
-                </div>
+                </AdminCard>
 
                 {/* Details Panel */}
                 {selectedCategory && (
-                    <Card className="w-full lg:w-100 shadow-sm border-gray-200 sticky top-8">
+                    <AdminCard className="w-full lg:w-100 sticky top-8 px-0">
                         <CardHeader className="border-b border-gray-100 pb-4">
                             <div className="flex items-center justify-between mb-2">
                                 <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20">
@@ -525,7 +526,7 @@ export default function CategoriesPage() {
                                 <Button className="bg-primary hover:bg-primary/90 font-bold">Save Changes</Button>
                             </div>
                         </CardContent>
-                    </Card>
+                    </AdminCard>
                 )}
             </div>
 
