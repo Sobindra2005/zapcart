@@ -24,6 +24,7 @@ import { CheckCircledIcon } from "@radix-ui/react-icons";
 import { Input } from "@repo/ui/ui/input";
 import { Label } from "@repo/ui/ui/label";
 import { Textarea } from "@repo/ui/ui/textarea";
+import { ToggleItem } from "@repo/ui/ui/switch";
 
 type SettingsTab = "profile" | "notifications" | "security" | "appearance" | "general";
 
@@ -76,20 +77,12 @@ export default function SettingsPage() {
     });
 
     return (
-        <div className="flex flex-col gap-6 p-8 bg-gray-50/50 min-h-screen">
-            {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-                <p className="text-sm text-gray-500 mt-1">
-                    Manage your account settings and preferences
-                </p>
-            </div>
-
+        <div className="flex flex-col gap-6 p-8 bg-gray-50/50 min-h-screen relative">
             {/* Settings Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 ">
                 {/* Sidebar Tabs */}
-                <div className="lg:col-span-3">
-                    <AdminCard>
+                <div className="lg:col-span-3 sticky top-8">
+                    <AdminCard >
                         <nav className="space-y-1">
                             {tabs.map((tab) => {
                                 const Icon = tab.icon;
@@ -262,43 +255,20 @@ export default function SettingsPage() {
                                             { key: "emailInventory", label: "Inventory alerts" },
                                             { key: "emailMarketing", label: "Marketing campaigns" },
                                         ].map(({ key, label }) => (
-                                            <div
+                                            <ToggleItem
                                                 key={key}
-                                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                                            >
-                                                <span className="text-sm font-medium text-gray-700">
-                                                    {label}
-                                                </span>
-                                                <button
-                                                    onClick={() =>
-                                                        setNotificationPrefs({
-                                                            ...notificationPrefs,
-                                                            [key]: !notificationPrefs[
-                                                                key as keyof typeof notificationPrefs
-                                                            ],
-                                                        })
-                                                    }
-                                                    className={cn(
-                                                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                                                        notificationPrefs[
-                                                            key as keyof typeof notificationPrefs
-                                                        ]
-                                                            ? "bg-primary"
-                                                            : "bg-gray-300"
-                                                    )}
-                                                >
-                                                    <span
-                                                        className={cn(
-                                                            "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                                                            notificationPrefs[
-                                                                key as keyof typeof notificationPrefs
-                                                            ]
-                                                                ? "translate-x-6"
-                                                                : "translate-x-1"
-                                                        )}
-                                                    />
-                                                </button>
-                                            </div>
+                                                id={`email-${key}`}
+                                                label={label}
+                                                checked={notificationPrefs[
+                                                    key as keyof typeof notificationPrefs
+                                                ]}
+                                                onCheckedChange={(checked) =>
+                                                    setNotificationPrefs({
+                                                        ...notificationPrefs,
+                                                        [key]: checked,
+                                                    })
+                                                }
+                                            />
                                         ))}
                                     </div>
                                 </div>
@@ -315,43 +285,20 @@ export default function SettingsPage() {
                                             { key: "pushInventory", label: "Inventory alerts" },
                                             { key: "pushMarketing", label: "Marketing campaigns" },
                                         ].map(({ key, label }) => (
-                                            <div
+                                            <ToggleItem
                                                 key={key}
-                                                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                                            >
-                                                <span className="text-sm font-medium text-gray-700">
-                                                    {label}
-                                                </span>
-                                                <button
-                                                    onClick={() =>
-                                                        setNotificationPrefs({
-                                                            ...notificationPrefs,
-                                                            [key]: !notificationPrefs[
-                                                                key as keyof typeof notificationPrefs
-                                                            ],
-                                                        })
-                                                    }
-                                                    className={cn(
-                                                        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                                                        notificationPrefs[
-                                                            key as keyof typeof notificationPrefs
-                                                        ]
-                                                            ? "bg-primary"
-                                                            : "bg-gray-300"
-                                                    )}
-                                                >
-                                                    <span
-                                                        className={cn(
-                                                            "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                                                            notificationPrefs[
-                                                                key as keyof typeof notificationPrefs
-                                                            ]
-                                                                ? "translate-x-6"
-                                                                : "translate-x-1"
-                                                        )}
-                                                    />
-                                                </button>
-                                            </div>
+                                                id={`push-${key}`}
+                                                label={label}
+                                                checked={notificationPrefs[
+                                                    key as keyof typeof notificationPrefs
+                                                ]}
+                                                onCheckedChange={(checked) =>
+                                                    setNotificationPrefs({
+                                                        ...notificationPrefs,
+                                                        [key]: checked,
+                                                    })
+                                                }
+                                            />
                                         ))}
                                     </div>
                                 </div>
@@ -441,29 +388,19 @@ export default function SettingsPage() {
                                             Add an extra layer of security to your account
                                         </p>
                                     </div>
-                                    <button
-                                        onClick={() =>
+
+                                    <ToggleItem
+                                        label=""
+                                        checked={securitySettings.twoFactorAuth}
+                                        onCheckedChange={(checked) =>
                                             setSecuritySettings({
                                                 ...securitySettings,
-                                                twoFactorAuth: !securitySettings.twoFactorAuth,
+                                                twoFactorAuth: checked,
                                             })
                                         }
-                                        className={cn(
-                                            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                                            securitySettings.twoFactorAuth
-                                                ? "bg-primary"
-                                                : "bg-gray-300"
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                                                securitySettings.twoFactorAuth
-                                                    ? "translate-x-6"
-                                                    : "translate-x-1"
-                                            )}
-                                        />
-                                    </button>
+                                        className="bg-transparent"
+                                    />
+
                                 </div>
                             </div>
 
@@ -478,30 +415,17 @@ export default function SettingsPage() {
                                             Get notified when someone logs into your account
                                         </p>
                                     </div>
-                                    <button
-                                        onClick={() =>
-                                            setSecuritySettings({
-                                                ...securitySettings,
-                                                loginNotifications:
-                                                    !securitySettings.loginNotifications,
-                                            })
-                                        }
-                                        className={cn(
-                                            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                                            securitySettings.loginNotifications
-                                                ? "bg-primary"
-                                                : "bg-gray-300"
-                                        )}
-                                    >
-                                        <span
-                                            className={cn(
-                                                "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                                                securitySettings.loginNotifications
-                                                    ? "translate-x-6"
-                                                    : "translate-x-1"
-                                            )}
-                                        />
-                                    </button>
+                                    <ToggleItem
+                                    label=""
+                                    checked={securitySettings.loginNotifications}
+                                    onCheckedChange={(checked) =>
+                                        setSecuritySettings({
+                                            ...securitySettings,
+                                            loginNotifications: checked,
+                                        })
+                                    }
+                                    className="bg-transparent"
+                                    />
                                 </div>
                             </div>
                         </AdminCard>
