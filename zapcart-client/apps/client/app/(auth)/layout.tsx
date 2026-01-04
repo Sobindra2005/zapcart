@@ -9,7 +9,7 @@ export default function AuthLayout({
         <div className="w-full lg:grid lg:grid-cols-2">
             {/* Left Side - Form Area */}
             <div className="flex flex-col justify-center px-8 py-12 md:px-12 lg:px-16 xl:px-24">
-                <div className="mx-auto w-full max-w-[440px]">
+                <div className="mx-auto w-full max-w-110">
 
 
                     {children}
@@ -22,9 +22,9 @@ export default function AuthLayout({
             </div>
 
             {/* Right Side - Visual Area */}
-            <div className="relative hidden bg-gradient-to-t from-blue-50 to-blue-100 lg:flex lg:flex-col lg:items-center lg:justify-center p-12">
+            <div className="relative hidden bg-linear-to-t from-blue-50 to-blue-100 lg:flex lg:flex-col lg:items-center lg:justify-center p-12">
                 {/* Background elements if any */}
-                <div className="relative aspect-square w-full max-w-[600px]">
+                <div className="relative aspect-square w-full max-w-150">
                     <Image
                         src="/assets/auth-safe.png"
                         alt="Secure Vault Illustration"
