@@ -30,31 +30,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
                     "--normal-text": "var(--popover-foreground)",
                     "--normal-border": "var(--border)",
                     "--border-radius": "var(--radius)",
-                    
-                    // Success state
-                    "--success-bg": "hsl(var(--success) / 0.1)",
-                    "--success-text": "hsl(var(--success))",
-                    "--success-border": "hsl(var(--success) / 0.3)",
 
-                    // Info state
-                    "--info-bg": "hsl(var(--info) / 0.1)",
-                    "--info-text": "hsl(var(--info))",
-                    "--info-border": "hsl(var(--info) / 0.3)",
-
-                    // Warning state
-                    "--warning-bg": "hsl(var(--warning) / 0.1)",
-                    "--warning-text": "hsl(var(--warning))",
-                    "--warning-border": "hsl(var(--warning) / 0.3)",
-
-                    // Error state
-                    "--error-bg": "hsl(var(--destructive) / 0.1)",
-                    "--error-text": "hsl(var(--destructive))",
-                    "--error-border": "hsl(var(--destructive) / 0.3)",
-
-                    // Loading state
-                    "--loading-bg": "hsl(var(--muted))",
-                    "--loading-text": "hsl(var(--muted-foreground))",
-                    "--loading-border": "hsl(var(--border))",
                 } as React.CSSProperties
             }
             {...props}

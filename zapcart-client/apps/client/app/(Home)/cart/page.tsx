@@ -41,7 +41,7 @@ export default function CartPage() {
                         </div>
 
                         {/* Divider */}
-                        <div className={`flex-1 h-px border-t-2 border-dashed max-w-[100px] ${step === 'checkout' || step === 'order' ? 'border-black' : 'border-gray-300'}`} />
+                        <div className={`flex-1 h-px border-t-2 border-dashed max-w-25 ${step === 'checkout' || step === 'order' ? 'border-black' : 'border-gray-300'}`} />
 
                         {/* Checkout Step */}
                         <div className={`flex items-center gap-3 ${step === 'checkout' ? 'opacity-100' : 'opacity-50'}`}>
@@ -52,7 +52,7 @@ export default function CartPage() {
                         </div>
 
                         {/* Divider */}
-                        <div className={`flex-1 h-px border-t-2 border-dashed max-w-[100px] ${step === 'order' ? 'border-black' : 'border-gray-300'}`} />
+                        <div className={`flex-1 h-px border-t-2 border-dashed max-w-25 ${step === 'order' ? 'border-black' : 'border-gray-300'}`} />
 
                         {/* Order Step */}
                         <div className={`flex items-center gap-3 ${step === 'order' ? 'opacity-100' : 'opacity-50'}`}>

@@ -14,8 +14,10 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { toast } from "sonner";
 import { authApi } from "@/utils/api";
+import { useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
+    const navigate = useNavigate();
     const form = useForm<SignupFormData>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
@@ -28,11 +30,12 @@ export default function SignupPage() {
 
     const signupMutation = useMutation({
         mutationFn: authApi.signup,
-        onSuccess: (data) => {
+        onSuccess: () => {
             toast.success("Account created successfully!", {
                 description: "Please check your email to verify your account.",
             });
             form.reset();
+            navigate("/");
         },
         onError: (error: any) => {
             console.error("Signup error:", error);
@@ -47,7 +50,7 @@ export default function SignupPage() {
         const nameParts = data.name.trim().split(" ");
         const lastName = nameParts.length > 1 ? nameParts.pop() : "";
         const firstName = nameParts.join(" ");
-        
+
         signupMutation.mutate({
             firstName,
             lastName: lastName || "",
