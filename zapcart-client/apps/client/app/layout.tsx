@@ -4,8 +4,9 @@ import "./globals.css";
 import { cn } from "@repo/lib/utils";
 import { CartProvider } from "@/contexts/CartContext";
 import { Header } from "@/components/Header";
-import { ReactQueryWrapper } from "@repo/ui/wrapper"; 
+import { ReactQueryWrapper } from "@repo/ui/wrapper";
 import { Toaster } from "@repo/ui/ui/toast";
+import { StoreProvider } from "@/components/providers/StoreProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,13 +27,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(inter.variable, "font-sans antialiased")}>
         <ReactQueryWrapper>
-          <CartProvider>
-            <Toaster />
-            <div className="min-h-screen bg-gray-50">
-              <Header />
-              {children}
-            </div>
-          </CartProvider>
+          <StoreProvider>
+            <CartProvider>
+              <Toaster />
+              <div className="min-h-screen bg-gray-50">
+                <Header />
+                {children}
+              </div>
+            </CartProvider>
+          </StoreProvider>
         </ReactQueryWrapper>
       </body>
     </html>

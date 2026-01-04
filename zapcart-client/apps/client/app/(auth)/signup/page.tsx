@@ -14,10 +14,16 @@ import { FaUser, FaLock } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { toast } from "sonner";
 import { authApi } from "@/utils/api";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import { useAuthStore, useUserStore } from "@/stores";
 
 export default function SignupPage() {
-    const navigate = useNavigate();
+    const router = useRouter();
+    
+    // Access methods directly for stable references
+    const login = useAuthStore((state) => state.login);
+    const setUser = useUserStore((state) => state.setUser);
+
     const form = useForm<SignupFormData>({
         resolver: zodResolver(signupSchema),
         defaultValues: {
@@ -30,12 +36,15 @@ export default function SignupPage() {
 
     const signupMutation = useMutation({
         mutationFn: authApi.signup,
-        onSuccess: () => {
+        onSuccess: (data) => {
             toast.success("Account created successfully!", {
                 description: "Please check your email to verify your account.",
             });
             form.reset();
-            navigate("/");
+            setUser(data?.user);
+            console.log("Signup successful:", data);
+            login();
+            router.push('/')
         },
         onError: (error: any) => {
             console.error("Signup error:", error);
