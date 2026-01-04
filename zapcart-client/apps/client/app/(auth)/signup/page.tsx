@@ -20,7 +20,7 @@ import { setAuthToken } from "@/app/actions/auth.actions";
 
 export default function SignupPage() {
     const router = useRouter();
-    
+
     const login = useAuthStore((state) => state.login);
     const setUser = useUserStore((state) => state.setUser);
 
@@ -36,19 +36,21 @@ export default function SignupPage() {
 
     const signupMutation = useMutation({
         mutationFn: authApi.signup,
-        onSuccess: async (data) => {
-            if (data?.token?.accessToken) {
-                await setAuthToken(data.token.accessToken);
+        onSuccess: async (response) => {
+            if (response?.data?.tokens?.accessToken) {
+                console.log("Setting auth token in httpOnly cookie");
+                await setAuthToken(response.data.tokens.accessToken);
             }
-            
             toast.success("Account created successfully!", {
                 description: "Please check your email to verify your account.",
             });
             form.reset();
-            setUser(data?.user);
-            console.log("Signup successful:", data);
+            setUser(response?.data?.user);
             login();
             router.push('/')
+            toast.success("Login successfully!", {
+                description: "You have been logged in automatically.",
+            });
         },
         onError: (error: any) => {
             console.error("Signup error:", error);
