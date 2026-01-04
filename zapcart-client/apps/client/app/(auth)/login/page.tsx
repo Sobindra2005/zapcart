@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { loginSchema, LoginFormData } from "@repo/lib/schemas/auth.schema";
 import { Button } from "@repo/ui/ui/button";
 import { Form } from "@repo/ui/ui/form";
@@ -11,19 +12,60 @@ import { FormPasswordInput } from "@repo/ui/form/FormPasswordInput";
 import { FcGoogle } from "react-icons/fc";
 import { MdEmail } from "react-icons/md";
 import { FaLock } from "react-icons/fa";
+import { toast } from "sonner";
+import { authApi } from "@/utils/api";
+import { useRouter } from "next/navigation";
+import { useAuthStore, useUserStore } from "@/stores";
+import { setAuthToken } from "@/app/actions/auth.actions";
 
 export default function LoginPage() {
+    const router = useRouter();
+    
+    const login = useAuthStore((state) => state.login);
+    const setUser = useUserStore((state) => state.setUser);
+
     const form = useForm<LoginFormData>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            email: "",
-            password: "",
+            email: "email@example.com",
+            password: "hello123",
+        },
+    });
+
+    const loginMutation = useMutation({
+        mutationFn: authApi.login,
+        onSuccess: async (response) => {
+            console.log("Login response:", response);
+
+            // Access token is in response.data.tokens.accessToken
+            if (response?.data?.tokens?.accessToken) {
+                console.log("Setting auth token in httpOnly cookie");
+                await setAuthToken(response.data.tokens.accessToken);
+            }
+            
+            toast.success("Login successful!", {
+                description: "Welcome back!",
+            });
+            form.reset();
+            setUser(response?.data?.user);
+            console.log("Login successful");
+            login();
+            router.push('/');
+        },
+        onError: (error: any) => {
+            console.error("Login error:", error);
+            const errorMessage = error.response?.data?.message || "Invalid email or password.";
+            toast.error("Login failed", {
+                description: `${errorMessage}${error.response?.status ? ` (Status: ${error.response.status})` : ""}`,
+            });
         },
     });
 
     const onSubmit = (data: LoginFormData) => {
-        // Mock submit
-        console.log("Logging in with:", data);
+        loginMutation.mutate({
+            email: data.email,
+            password: data.password,
+        });
     };
 
     return (
@@ -79,9 +121,9 @@ export default function LoginPage() {
                     <Button
                         type="submit"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-md rounded-xl h-12 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={!form.formState.isValid || form.formState.isSubmitting}
+                        disabled={!form.formState.isValid || loginMutation.isPending}
                     >
-                        {form.formState.isSubmitting ? "Logging in..." : "Continue"}
+                        {loginMutation.isPending ? "Logging in..." : "Continue"}
                     </Button>
                 </form>
             </Form>

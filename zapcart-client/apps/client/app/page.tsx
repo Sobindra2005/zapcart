@@ -5,7 +5,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { sampleProducts } from "@/data/products";
 import { FeaturedProducts } from "@/components/featuredProduct";
 
-export default function Home() {
+export default async function Home() {
   return (
       <main>
         <Hero />

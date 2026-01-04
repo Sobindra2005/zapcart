@@ -74,6 +74,8 @@ export const config = {
     CLOUDINARY_CLOUD_NAME: getEnvVariable('CLOUDINARY_CLOUD_NAME'),
     CLOUDINARY_API_KEY: getEnvVariable('CLOUDINARY_API_KEY'),
     CLOUDINARY_API_SECRET: getEnvVariable('CLOUDINARY_API_SECRET'),
+
+    frontendUrl: getEnvVariable('FRONTEND_URL'),
 } as const;
 
 /**
@@ -85,7 +87,7 @@ export const validateEnv = (): void => {
         console.log('🔍 Validating environment variables...');
 
         // This will throw if any required variable is missing
-        const requiredVars = ['PORT', 'NODE_ENV', 'DATABASE_URL', 'MONGODB_URL', 'REDIS_HOST', 'REDIS_PORT', 'JWT_SECRET'];
+        const requiredVars = ['PORT', 'NODE_ENV', 'DATABASE_URL', 'MONGODB_URL', 'REDIS_HOST', 'REDIS_PORT', 'JWT_SECRET','FRONTEND_URL'];
 
         requiredVars.forEach(key => {
             getEnvVariable(key);

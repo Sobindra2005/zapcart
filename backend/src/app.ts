@@ -10,6 +10,7 @@ import './workers/searchIndexWork.ts'
 
 const app = express();
 
+
 /**
  * SECURITY MIDDLEWARES
  */
@@ -17,9 +18,10 @@ const app = express();
 // Set security HTTP headers
 app.use(helmet());
 
+
 // Enable CORS for all routes
 app.use(cors({
-    origin: config.nodeEnv === 'development' ? '*' : [], // Configure allowed origins in production
+    origin: [`${config.frontendUrl}`],
     credentials: true,
 }));
 
