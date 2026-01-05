@@ -10,6 +10,7 @@ import { useState, useEffect, useRef } from "react";
 import { searchProducts, popularCategoriesSearch, SearchProduct, PopularCategory } from "@/data/searchSuggestions";
 import { motion } from "framer-motion";
 import { useCart } from "@/contexts/CartContext";
+import { selectIsAuthenticated, useAuthStore } from "@/stores";
 
 export function Header() {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
@@ -18,6 +19,7 @@ export function Header() {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { getTotalItems } = useCart();
     const totalItems = getTotalItems();
+    const isAuthenticated = useAuthStore(selectIsAuthenticated)
 
     // Filter products based on search query
     useEffect(() => {
@@ -159,24 +161,42 @@ export function Header() {
                 </nav>
 
                 {/* Actions */}
+                {/* Actions */}
                 <div className="flex items-center gap-4">
-                    <Link href="/account">
-                        <Button variant="ghost" size="lg" className="hidden md:flex">
-                            <User className="h-6 w-6" />
-                            <span className="">Account</span>
-                        </Button>
-                    </Link>
-                    <Link href="/cart">
-                        <Button variant="ghost" size="lg" className="relative">
-                            <ShoppingCart className="h-6 w-6" />
-                            <span className="">Cart</span>
-                            {totalItems > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                                    {totalItems}
-                                </span>
-                            )}
-                        </Button>
-                    </Link>
+                    {isAuthenticated ? (
+                        <>
+                            <Link href="/account">
+                                <Button variant="ghost" size="lg" className="hidden md:flex">
+                                    <User className="h-6 w-6" />
+                                    <span className="">Account</span>
+                                </Button>
+                            </Link>
+                            <Link href="/cart">
+                                <Button variant="ghost" size="lg" className="relative">
+                                    <ShoppingCart className="h-6 w-6" />
+                                    <span className="">Cart</span>
+                                    {totalItems > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                            {totalItems}
+                                        </span>
+                                    )}
+                                </Button>
+                            </Link>
+                        </>
+                    ) : (
+                        <>
+                            <Link href="/login">
+                                <Button variant="ghost" size="lg">
+                                    <span>Login</span>
+                                </Button>
+                            </Link>
+                            <Link href="/signup">
+                                <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                    <span>Sign Up</span>
+                                </Button>
+                            </Link>
+                        </>
+                    )}
                 </div>
             </MainContainer>
         </header >
