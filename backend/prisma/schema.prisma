@@ -358,10 +358,17 @@ model InventoryLog {
 // ===========================
 // SYSTEM SETTINGS
 // ===========================
+enum SystemSettingKey {
+  SHIPPING_FEE
+  ESTIMATED_DELIVERY_DAYS
+  SHIPPING_INFO
+  SUPPORT_EMAIL
+  MAINTENANCE_MODE
+}
 
 model SystemSetting {
   id          Int      @id @default(autoincrement())
-  key         String   @unique
+  key         String   @unique 
   value       String
   description String?
   

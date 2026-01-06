@@ -17,8 +17,7 @@ interface ProductInfoProps {
 export function ProductInfo({ product }: ProductInfoProps) {
 
     const availableSizes = product.hasVariants && product.variants
-        ? Array.from(new Set(product.variants.map(v => v.size).filter(Boolean)))
-        : product.sizes || [];
+        && Array.from(new Set(product.variants.map(v => v.size).filter(Boolean))) || []
 
     // Check if product has variants but no sizes
     const hasVariantsWithoutSizes = product.hasVariants && product.variants && product.variants.length > 0 && availableSizes.length === 0;
@@ -42,7 +41,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
     // Determine price and stock based on variant or product
     const currentPrice = currentVariant?.price ?? product.basePrice;
-    const currentStock = currentVariant?.stock ?? product.inStock;
+    const currentStock = currentVariant?.stock ?? product.totalStock;
 
     const handleIncrement = () => {
         setQuantity((prev) => prev + 1);
@@ -102,7 +101,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
             {/* Size Selector */}
             {availableSizes && availableSizes.length > 0 && (
                 <SizeSelector
-                    sizes={availableSizes}
+                    sizes={availableSizes as string[]}
                     selectedSize={selectedSize}
                     onSizeChange={setSelectedSize}
                 />

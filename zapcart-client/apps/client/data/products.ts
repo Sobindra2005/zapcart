@@ -435,7 +435,6 @@ export const sampleProducts: Product[] = [
                 "reviewCount": 318,
                 "createdAt": "2026-01-04T07:02:24.709Z",
                 "updatedAt": "2026-01-04T07:02:24.709Z",
-                "__v": 0,
                 "inStock": true,
                 "isLowStock": false,
                 "discountPercentage": 0,
@@ -586,110 +585,7 @@ export const sampleProducts: Product[] = [
                 "discountPercentage": 0,
                 "id": "695a107fe8db2f55a021ac14"
             },
-            {
-                "dimensions": {
-                    "length": 99.7,
-                    "width": 68.2,
-                    "height": 38.5,
-                    "unit": "cm"
-                },
-                "_id": "695a107fe8db2f55a021ac30",
-                "name": "Luxurious Ceramic Computer",
-                "slug": "luxurious-ceramic-computer-6z9xow",
-                "description": "Featuring Scandium-enhanced technology, our Gloves offers unparalleled phony performance",
-                "shortDescription": "Debilito vir cedo traho bene alter adflicto cinis ventus solitudo tardus amitto pecus.",
-                "basePrice": 98.59,
-                "category": {
-                    "_id": "695a107ae8db2f55a021aba5",
-                    "name": "Sleek Pizza VaZQ",
-                    "slug": "sleek-pizza-vazq",
-                    "description": "Ad libero avarus defendo deleo expedita. Maxime terror adstringo pecco amplexus. Sustineo tenuis pecco deficio vigilo advenio.",
-                    "parent": "695a1075e8db2f55a021ab25",
-                    "ancestors": [
-                        "695a1075e8db2f55a021ab25"
-                    ],
-                    "level": 1,
-                    "image": "https://picsum.photos/seed/DUds7ploNI/category/400/300",
-                    "icon": "🏠",
-                    "color": "#fdad9d",
-                    "metaTitle": "Minima tabgo vacuus absque tam.",
-                    "metaDescription": "Deprecator incidunt fuga nesciunt utroque patrocinor desipio optio.",
-                    "metaKeywords": [
-                        "distinctio",
-                        "pecco",
-                        "combibo",
-                        "trucido",
-                        "accommodo"
-                    ],
-                    "isActive": true,
-                    "displayOrder": 25,
-                    "productCount": 0,
-                    "createdAt": "2026-01-04T07:02:18.656Z",
-                    "updatedAt": "2026-01-04T07:02:18.656Z",
-                    "__v": 0,
-                    "isRoot": false,
-                    "id": "695a107ae8db2f55a021aba5"
-                },
-                "subcategories": [],
-                "brand": "Koepp, Carroll and Borer",
-                "tags": [
-                    "iure",
-                    "artificiose",
-                    "cresco",
-                    "vulgo",
-                    "odio"
-                ],
-                "hasVariants": false,
-                "variants": [],
-                "totalStock": 822,
-                "lowStockThreshold": 19,
-                "trackInventory": true,
-                "allowBackorder": false,
-                "images": [
-                    "https://picsum.photos/seed/5RtrltUzMw/800/800",
-                    "https://picsum.photos/seed/citFWaHbYA/800/800",
-                    "https://picsum.photos/seed/s0UOqvjURK/800/800",
-                    "https://picsum.photos/seed/c0zYFezYG0/800/800",
-                    "https://picsum.photos/seed/vuHv9Zt2ia/800/800",
-                    "https://picsum.photos/seed/uybdPOJWk0/800/800"
-                ],
-                "thumbnail": "https://picsum.photos/seed/FjEfnhPHft/400/400",
-                "metaTitle": "Suffoco cupressus adamo.",
-                "metaDescription": "Tempus verto crastinus uterque arto amitto aliqua compono unde hic.",
-                "metaKeywords": [
-                    "testimonium",
-                    "aestas",
-                    "placeat",
-                    "timidus",
-                    "adopto"
-                ],
-                "specifications": {
-                    "Material": "Ceramic",
-                    "Weight": "9.62 kg",
-                    "Dimensions": "81x39 cm"
-                },
-                "features": [
-                    "Est tamisium conitor via cognomen nulla.",
-                    "Aliqua tantillus suffragium.",
-                    "Sol possimus in arcus tenax depulso conscendo volup dicta asperiores.",
-                    "Acer comes damnatio contabesco deorsum alias attonbitus currus."
-                ],
-                "weight": 3,
-                "status": "active",
-                "visibility": "featured",
-                "publishedAt": "2025-04-25T21:10:55.230Z",
-                "viewCount": 9245,
-                "salesCount": 360,
-                "averageRating": 4.2,
-                "reviewCount": 260,
-                "createdAt": "2026-01-04T07:02:23.866Z",
-                "updatedAt": "2026-01-04T07:02:23.866Z",
-                "__v": 0,
-                "inStock": true,
-                "isLowStock": false,
-                "discountPercentage": 0,
-                "id": "695a107fe8db2f55a021ac30"
-            },
+            
             {
                 "dimensions": {
                     "length": 31.6,
