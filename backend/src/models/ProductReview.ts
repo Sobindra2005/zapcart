@@ -15,7 +15,7 @@ export interface IProductReview extends Document {
 
   // Verification
   isVerifiedPurchase: boolean;
-  orderId?: mongoose.Types.ObjectId;
+  orderId?: number;
 
   // Helpful votes
   helpfulCount: number;
@@ -25,13 +25,13 @@ export interface IProductReview extends Document {
   // Moderation
   status: 'pending' | 'approved' | 'rejected';
   moderatorNote?: string;
-  moderatedBy?: mongoose.Types.ObjectId;
+  moderatedBy?: number;
   moderatedAt?: Date;
 
   // Reply from seller/admin
   reply?: {
     content: string;
-    repliedBy: mongoose.Types.ObjectId;
+    repliedBy: number;
     repliedAt: Date;
   };
 
@@ -151,7 +151,7 @@ const ProductReviewSchema = new Schema<IProductReview>(
       min: 0
     },
     helpfulVotes: [{
-      type:Number,
+      type: Number,
     }],
 
     // Moderation

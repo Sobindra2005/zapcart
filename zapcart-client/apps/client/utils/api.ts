@@ -63,3 +63,15 @@ export const productApi = {
         return apiClient.get('/products/featured');
     }
 };
+
+export const reviewsApi={
+    getReviewsByProductId: (productId: string) => {
+        return apiClient.get(`/reviews/product/${productId}`);
+    }
+}
+
+export const systemSettingsApi = {
+    getSettings: () => {
+        return apiClient.get('/settings');
+    }
+};

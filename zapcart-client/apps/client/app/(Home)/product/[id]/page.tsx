@@ -19,7 +19,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
         notFound();
     }
 
-    // Default images if not provided
     const images = (product.images && product.images.filter((img): img is string => typeof img === "string")) ||
         [product.thumbnail, product.thumbnail, product.thumbnail, product.thumbnail].filter((img): img is string => typeof img === "string");
 
