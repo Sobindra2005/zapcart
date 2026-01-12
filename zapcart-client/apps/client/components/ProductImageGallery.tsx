@@ -15,6 +15,8 @@ export function ProductImageGallery({ images }: ProductImageGalleryProps) {
         setImageErrors(prev => new Set(prev).add(index));
     };
 
+    console.log("Rendering ProductImageGallery with images:", images, "and imageErrors:", imageErrors);
+
     return (
         <div className="space-y-4">
             {/* Main Image */}

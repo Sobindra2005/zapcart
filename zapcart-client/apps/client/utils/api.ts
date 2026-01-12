@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import { getCookie } from './cookies';
+import { get } from 'http';
 
 const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL || 'http://localhost:8080/api';
 
@@ -61,10 +62,13 @@ export const authApi = {
 export const productApi = {
     getProducts: () => {
         return apiClient.get('/products/featured');
+    },
+    getProductById: (id: string) => {
+        return apiClient.get(`/products/${id}`);
     }
 };
 
-export const reviewsApi={
+export const reviewsApi = {
     getReviewsByProductId: (productId: string) => {
         return apiClient.get(`/reviews/product/${productId}`);
     }

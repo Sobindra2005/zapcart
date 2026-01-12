@@ -4,15 +4,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Star, X } from "lucide-react";
-import { Review } from "@/types/product";
+import { Star } from "lucide-react";
 import { ReviewCard } from "./ReviewCard";
 import { Button } from "@repo/ui/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@repo/ui/ui/form";
 import { Input } from "@repo/ui/ui/input";
 import { Textarea } from "@repo/ui/ui/textarea";
 import { cn } from "@repo/lib/utils";
-import {motion} from "framer-motion"
+import { motion } from "framer-motion"
+import { useQuery } from "@tanstack/react-query";
+import { reviewsApi } from "@/utils/api";
 
 // Review form validation schema
 const reviewSchema = z.object({
@@ -24,12 +25,11 @@ const reviewSchema = z.object({
 type ReviewFormData = z.infer<typeof reviewSchema>;
 
 interface ReviewsSectionProps {
-    rating: number;
-    reviewCount: number;
-    reviews: Review[];
+    productId: string;
 }
 
-export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionProps) {
+export function ReviewsSection({ productId }: ReviewsSectionProps) {
+    // rating, reviewCount, reviews
     const [showReviewForm, setShowReviewForm] = useState(false);
 
     const form = useForm<ReviewFormData>({
@@ -40,6 +40,14 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
             comment: "",
         },
     });
+
+    const { data } = useQuery({
+        queryKey: ['productReviews', productId],
+        queryFn: () => reviewsApi.getReviewsByProductId(productId)
+    })
+
+    return;
+
 
     // Calculate rating breakdown
     const ratingBreakdown = [5, 4, 3, 2, 1].map(stars => {
@@ -86,8 +94,8 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
                                         <Star
                                             key={i}
                                             className={`w-3.5 h-3.5 ${i < stars
-                                                    ? "fill-yellow-400 text-yellow-400"
-                                                    : "fill-gray-300 text-gray-300"
+                                                ? "fill-yellow-400 text-yellow-400"
+                                                : "fill-gray-300 text-gray-300"
                                                 }`}
                                         />
                                     ))}
@@ -118,7 +126,7 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
 
                     {/* Review Form */}
                     {showReviewForm && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
