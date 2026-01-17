@@ -3,6 +3,7 @@ import asyncHandler from '@/utils/asyncHandler';
 import AppError from '@/utils/AppError';
 import ProductReview, { IProductReview } from '@/models/ProductReview';
 import mongoose from 'mongoose';
+import { prisma } from '@/config/prisma';
 
 /**
  * Get all reviews for a product
@@ -49,7 +50,6 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
         verifiedOnly: verifiedOnly === 'true',
     });
 
-    console.log('Fetched reviews:', reviews);
 
     interface ReviewQuery {
         product: string;
@@ -73,13 +73,49 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
 
     const total = await ProductReview.countDocuments(query);
 
+    const userIds = [...new Set(reviews.map(review => review.user))];
+
+    // Fetch user details from Prisma in one query
+    const users = await prisma.user.findMany({
+        where: {
+            id: { in: userIds }
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true
+        }
+    });
+
+    // Create a map for quick user lookup
+    const userMap = new Map(
+        users.map(user => [
+            user.id,
+            {
+                name: `${user.firstName} ${user.lastName}`,
+                avatar: user.avatar,
+                id: user.id
+            }
+        ])
+    );
+
+    // Enrich reviews with user data
+    const enrichedReviews = reviews.map(review => {
+        const reviewObj = review.toObject();
+        return {
+            ...reviewObj,
+            user: userMap.get(review.user) || { name: 'Unknown User', avatar: null }
+        };
+    });
+
     res.status(200).json({
         status: 'success',
-        results: reviews.length,
+        results: enrichedReviews.length,
         total,
         page: pageNum,
         pages: Math.ceil(total / limitNum),
-        data: { reviews },
+        data: { reviews: enrichedReviews },
     });
 });
 
@@ -203,7 +239,7 @@ export const getUserReviews = asyncHandler(async (req: Request, res: Response) =
 export const updateReview = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
-    const { rating, title, comment, images } = req.body;
+    const { rating, comment, images } = req.body;
 
     const review = await ProductReview.findById(id);
 
@@ -218,7 +254,6 @@ export const updateReview = asyncHandler(async (req: Request, res: Response) => 
 
     // Update fields
     if (rating !== undefined) review.rating = rating;
-    if (title !== undefined) review.title = title;
     if (comment !== undefined) review.comment = comment;
     if (images !== undefined) review.images = images;
 

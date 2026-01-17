@@ -1,7 +1,8 @@
 
 interface productUser {
+    id: number;
     name: string;
-    avatarUrl?: string;
+    avatar?: string;
 }
 
 export interface IProductReview {
@@ -25,7 +26,7 @@ export interface IProductReview {
     // Helpful votes
     helpfulCount: number;
     notHelpfulCount: number;
-    helpfulVotes: productUser[]; 
+    helpfulVotes: productUser[];
     notHelpfulVotes: productUser[];
 
     // Moderation

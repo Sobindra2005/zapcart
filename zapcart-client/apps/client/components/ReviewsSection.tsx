@@ -17,7 +17,7 @@ import { reviewsApi } from "@/utils/api";
 import { getQueryClient } from "../../../packages/ui/src/get-query-client";
 import { Product } from "@/types/product";
 import { IProductReview } from "@/types/productReviews";
-import { selectUserId, useUserStore } from "@/stores";
+import {  selectUserId, useUserStore } from "@/stores";
 import { SectionHeader } from "./SectionHeader";
 
 // Review form validation schema
@@ -87,6 +87,8 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
         const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
         return { stars, count, percentage };
     });
+
+    const userId = selectUserId(useUserStore())
 
     const createReviewMutation = useMutation({
         mutationFn: reviewsApi.createReview,
@@ -332,6 +334,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
                         {reviews.length > 0 ? (
                             reviews.map((review) => (
                                 <ReviewCard
+                                    authorReview={userId === review.user.id}
                                     key={review.id}
                                     review={review}
                                     onVoteHelpful={handleVoteHelpful}

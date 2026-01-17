@@ -7,6 +7,7 @@ import { SectionHeader } from "./SectionHeader"
 import { useQuery } from "@tanstack/react-query"
 import { productApi } from "@/utils/api"
 import { Product } from "@/types/product"
+import Link from "next/link"
 
 export function FeaturedProducts() {
 
@@ -32,7 +33,7 @@ export function FeaturedProducts() {
                 {showSkeleton ? (
                     <HeroProductSkeleton />
                 ) : (
-                    <div className="lg:col-span-1 lg:row-span-2 group relative rounded-xl overflow-hidden bg-muted">
+                    <Link href={`/product/${heroProduct.id || heroProduct._id}`} className="lg:col-span-1 lg:row-span-2 group relative rounded-xl overflow-hidden bg-muted">
                         <div className="relative w-full h-96 lg:h-full min-h-96">
                             <Image
                                 src={heroProduct.images?.[0] || heroProduct.thumbnail || "/placeholder.svg"}
@@ -54,7 +55,7 @@ export function FeaturedProducts() {
                             </div>
                             <Button className=" bg-red-400 hover:bg-red-600 w-full">Shop Now</Button>
                         </div>
-                    </div>
+                    </Link>
                 )
                 }
 
@@ -65,7 +66,7 @@ export function FeaturedProducts() {
                         <GridProductSkeleton />
                     ) : (
                         gridProducts.map((product, idx) => (
-                            <div key={product.id || product._id || idx} className="group relative rounded-xl overflow-hidden bg-muted cursor-pointer">
+                            <Link href={`/product/${product.id || product._id}`} key={product.id || product._id || idx} className="group relative rounded-xl overflow-hidden bg-muted cursor-pointer">
                                 <div className="relative w-full aspect-square">
                                     <Image
                                         src={product.images?.[0] || product.thumbnail || "/placeholder.svg"}
@@ -92,7 +93,7 @@ export function FeaturedProducts() {
                                         )}
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))
                     )}
                 </div>

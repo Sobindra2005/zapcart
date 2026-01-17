@@ -7,7 +7,6 @@ export interface IProductReview extends Document {
 
   // Review Content
   rating: number;
-  title?: string;
   comment: string;
 
   // Media

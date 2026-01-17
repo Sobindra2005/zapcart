@@ -2,19 +2,32 @@
 
 import { useState } from "react";
 import { IProductReview } from "@/types/productReviews";
-import { Star, ThumbsUp, ThumbsDown, BadgeCheck, MessageSquare, Image as ImageIcon, X } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, BadgeCheck, MessageSquare, Image as ImageIcon, X, Edit, Trash2, Upload } from "lucide-react";
 import { Button } from "@repo/ui/ui/button";
 import { cn } from "@repo/lib/utils";
 import { format } from "date-fns";
+import { Textarea } from "@repo/ui/ui/textarea";
+import Image from "next/image";
 
 interface ReviewCardProps {
     review: IProductReview;
     onVoteHelpful?: (reviewId: string, voteType: 'helpful' | 'notHelpful') => void;
+    authorReview?: boolean;
 }
 
-export function ReviewCard({ review, onVoteHelpful }: ReviewCardProps) {
+export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardProps) {
     const [userVote, setUserVote] = useState<'helpful' | 'notHelpful' | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    
+    // Edit mode state grouped
+    const [editState, setEditState] = useState({
+        rating: review.rating,
+        comment: review.comment,
+        existingImages: review.images || [],
+        newImageFiles: [] as File[],
+        newImagePreviews: [] as string[]
+    });
     
     // Optimistic UI counts
     const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
@@ -66,13 +79,97 @@ export function ReviewCard({ review, onVoteHelpful }: ReviewCardProps) {
         }
     };
 
+    const handleEditReview = () => {
+        setIsEditing(true);
+        setEditState({
+            rating: review.rating,
+            comment: review.comment,
+            existingImages: review.images || [],
+            newImageFiles: [],
+            newImagePreviews: []
+        });
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditState({
+            rating: review.rating,
+            comment: review.comment,
+            existingImages: review.images || [],
+            newImageFiles: [],
+            newImagePreviews: []
+        });
+    };
+
+    const handleSaveEdit = async () => {
+        // TODO: Implement API call to update review
+        console.log("Save edited review:", {
+            reviewId: review.id,
+            rating: editState.rating,
+            comment: editState.comment,
+            newImages: editState.newImageFiles
+        });
+        
+        // For now, just exit edit mode
+        setIsEditing(false);
+        setEditState(prev => ({
+            ...prev,
+            newImageFiles: [],
+            newImagePreviews: []
+        }));
+    };
+
+    const handleRemoveExistingImage = (imageUrl: string) => {
+        setEditState(prev => ({
+            ...prev,
+            existingImages: prev.existingImages.filter(img => img !== imageUrl)
+        }));
+    };
+
+    const handleNewImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        const totalImages = editState.existingImages.length + editState.newImageFiles.length + files.length;
+        if (totalImages > 5) {
+            alert("Maximum 5 images allowed");
+            return;
+        }
+
+        const previews = files.map(file => URL.createObjectURL(file));
+        setEditState(prev => ({
+            ...prev,
+            newImageFiles: [...prev.newImageFiles, ...files],
+            newImagePreviews: [...prev.newImagePreviews, ...previews]
+        }));
+    };
+
+    const handleRemoveNewImage = (index: number) => {
+        URL.revokeObjectURL(editState.newImagePreviews[index]);
+        setEditState(prev => ({
+            ...prev,
+            newImageFiles: prev.newImageFiles.filter((_, i) => i !== index),
+            newImagePreviews: prev.newImagePreviews.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleDeleteReview = () => {
+        // TODO: Implement delete functionality
+        if (confirm("Are you sure you want to delete this review?")) {
+            console.log("Delete review:", review.id);
+        }
+    };
+
     return (
-        <div className="py-6 border rounded-lg p-6 mb-4 bg-gray-50">
+        <div className={cn(
+            "py-6 border rounded-lg p-6 mb-4",
+            authorReview ? "bg-blue-50 border-blue-200" : "bg-gray-50"
+        )}>
             <div className="flex items-start gap-4 mb-3">
                 <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center shrink-0">
-                    {review?.user?.avatarUrl ? (
+                    {review?.user?.avatar ? (
                         <img 
-                            src={review.user.avatarUrl} 
+                            src={review.user.avatar} 
                             alt={review.user.name} 
                             className="w-full h-full rounded-full object-cover"
                         />
@@ -86,6 +183,11 @@ export function ReviewCard({ review, onVoteHelpful }: ReviewCardProps) {
                     <div className="flex items-start justify-between mb-1">
                         <div className="flex items-center gap-2">
                             <h4 className="font-semibold">{review?.user ? review.user.name : "Anonymous"}</h4>
+                            {authorReview && (
+                                <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
+                                    Your Review
+                                </span>
+                            )}
                             {review.isVerifiedPurchase && (
                                 <div className="flex items-center gap-1 text-green-600 text-xs font-medium">
                                     <BadgeCheck className="w-4 h-4" />
@@ -93,6 +195,26 @@ export function ReviewCard({ review, onVoteHelpful }: ReviewCardProps) {
                                 </div>
                             )}
                         </div>
+                        {authorReview && !isEditing && (
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleEditReview}
+                                    className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100"
+                                >
+                                    <Edit className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleDeleteReview}
+                                    className="h-8 px-2 text-red-600 hover:text-red-700 hover:bg-red-100"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        )}
                     </div>
                     <span className="text-sm text-muted-foreground">{formatDate(review.createdAt)}</span>
                     <div className="flex items-center gap-1 mt-2">
@@ -110,38 +232,155 @@ export function ReviewCard({ review, onVoteHelpful }: ReviewCardProps) {
                 </div>
             </div>
             
-            {review.title && (
-                <h5 className="font-semibold text-base mb-2 ml-16">{review.title}</h5>
-            )}
-            
-            <p className="text-sm text-gray-600 leading-relaxed ml-16 mb-4">{review.comment}</p>
-
-            {/* Review Images */}
-            {review.images && review.images.length > 0 && (
-                <div className="ml-16 mb-4">
-                    {/* <div className="flex items-center gap-2 mb-2">
-                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                        <button 
-                            onClick={() => setShowImages(!showImages)}
-                            className="text-sm text-blue-600 hover:underline"
-                        >
-                            {showImages ? 'Hide' : 'View'} {review.images.length} {review.images.length === 1 ? 'image' : 'images'}
-                        </button>
-                    </div> */}
-              
-                        <div className="flex gap-2 flex-wrap">
-                            {review.images.map((img, idx) => (
-                                <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`Review image ${idx + 1}`}
-                                    className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-                                    onClick={() => setPreviewImage(img)}
-                                />
+            {isEditing ? (
+                // Edit Mode
+                <div className="ml-16 space-y-4">
+                    {/* Rating Edit */}
+                    <div>
+                        <label className="text-sm font-medium mb-2 block">Rating</label>
+                        <div className="flex gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setEditState(prev => ({ ...prev, rating: star }))}
+                                    className="transition-transform hover:scale-110"
+                                >
+                                    <Star
+                                        className={cn(
+                                            "w-6 h-6 cursor-pointer transition-colors",
+                                            star <= editState.rating
+                                                ? "fill-yellow-400 text-yellow-400"
+                                                : "fill-gray-300 text-gray-300 hover:fill-yellow-200 hover:text-yellow-200"
+                                        )}
+                                    />
+                                </button>
                             ))}
                         </div>
+                    </div>
 
+                    {/* Comment Edit */}
+                    <div>
+                        <label className="text-sm font-medium mb-2 block">Your Review</label>
+                        <Textarea
+                            value={editState.comment}
+                            onChange={(e) => setEditState(prev => ({ ...prev, comment: e.target.value }))}
+                            placeholder="Share your experience with this product..."
+                            className="min-h-24 resize-none"
+                        />
+                    </div>
+
+                    {/* Images Edit */}
+                    <div>
+                        <label className="text-sm font-medium mb-2 block">Images</label>
+                        
+                        {/* Existing Images */}
+                        {editState.existingImages.length > 0 && (
+                            <div className="flex gap-2 flex-wrap mb-3">
+                                {editState.existingImages.map((img, idx) => (
+                                    <div key={idx} className="relative group">
+                                        <img
+                                            src={img}
+                                            alt={`Review image ${idx + 1}`}
+                                            className="w-20 h-20 object-cover rounded-lg"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveExistingImage(img)}
+                                            className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* New Images Preview */}
+                        {editState.newImagePreviews.length > 0 && (
+                            <div className="flex gap-2 flex-wrap mb-3">
+                                {editState.newImagePreviews.map((preview, idx) => (
+                                    <div key={idx} className="relative group">
+                                        <Image
+                                            src={preview}
+                                            alt={`New image ${idx + 1}`}
+                                            width={80}
+                                            height={80}
+                                            className="w-20 h-20 object-cover rounded-lg"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveNewImage(idx)}
+                                            className="absolute top-1 right-1 p-1 bg-red-500 hover:bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Upload Button */}
+                        {(editState.existingImages.length + editState.newImageFiles.length) < 5 && (
+                            <div>
+                                <label
+                                    htmlFor={`edit-images-${review.id}`}
+                                    className="flex items-center gap-2 px-4 py-2 border border-input rounded-md cursor-pointer hover:bg-muted transition-colors w-fit"
+                                >
+                                    <Upload className="w-4 h-4" />
+                                    <span className="text-sm">Upload Images</span>
+                                </label>
+                                <input
+                                    id={`edit-images-${review.id}`}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleNewImageSelect}
+                                    className="hidden"
+                                />
+                                <span className="text-xs text-muted-foreground mt-1 block">
+                                    Max 5 images (Current: {editState.existingImages.length + editState.newImageFiles.length})
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-2">
+                        <Button onClick={handleSaveEdit} size="sm">
+                            Save Changes
+                        </Button>
+                        <Button onClick={handleCancelEdit} variant="outline" size="sm">
+                            Cancel
+                        </Button>
+                    </div>
                 </div>
+            ) : (
+                // View Mode
+                <>
+                    {review.title && (
+                        <h5 className="font-semibold text-base mb-2 ml-16">{review.title}</h5>
+                    )}
+                    
+                    <p className="text-sm text-gray-600 leading-relaxed ml-16 mb-4">{review.comment}</p>
+
+                    {/* Review Images */}
+                    {review.images && review.images.length > 0 && (
+                        <div className="ml-16 mb-4">
+                            <div className="flex gap-2 flex-wrap">
+                                {review.images.map((img, idx) => (
+                                    <img
+                                        key={idx}
+                                        src={img}
+                                        alt={`Review image ${idx + 1}`}
+                                        className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                        onClick={() => setPreviewImage(img)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
 
             {/* Image Preview Modal */}
@@ -167,43 +406,45 @@ export function ReviewCard({ review, onVoteHelpful }: ReviewCardProps) {
             )}
 
             {/* Helpful Votes */}
-            <div className="ml-16 flex items-center gap-4 pt-3 border-t">
-                <span className="text-sm text-muted-foreground">Was this helpful?</span>
-                <div className="flex items-center gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleVote('helpful')}
-                        className={cn(
-                            "h-8 px-3 gap-1.5 transition-all",
-                            userVote === 'helpful' && "bg-green-50 border-green-600 text-green-600"
-                        )}
-                    >
-                        <ThumbsUp className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium">{helpfulCount}</span>
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleVote('notHelpful')}
-                        className={cn(
-                            "h-8 px-3 gap-1.5 transition-all",
-                            userVote === 'notHelpful' && "bg-red-50 border-red-600 text-red-600"
-                        )}
-                    >
-                        <ThumbsDown className="w-3.5 h-3.5" />
-                        <span className="text-xs font-medium">{notHelpfulCount}</span>
-                    </Button>
+            {!authorReview && !isEditing && (
+                <div className="ml-16 flex items-center gap-4 pt-3 border-t">
+                    <span className="text-sm text-muted-foreground">Was this helpful?</span>
+                    <div className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleVote('helpful')}
+                            className={cn(
+                                "h-8 px-3 gap-1.5 transition-all",
+                                userVote === 'helpful' && "bg-green-50 border-green-600 text-green-600"
+                            )}
+                        >
+                            <ThumbsUp className="w-3.5 h-3.5" />
+                            <span className="text-xs font-medium">{helpfulCount}</span>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleVote('notHelpful')}
+                            className={cn(
+                                "h-8 px-3 gap-1.5 transition-all",
+                                userVote === 'notHelpful' && "bg-red-50 border-red-600 text-red-600"
+                            )}
+                        >
+                            <ThumbsDown className="w-3.5 h-3.5" />
+                            <span className="text-xs font-medium">{notHelpfulCount}</span>
+                        </Button>
+                    </div>
+                    {review.helpfulnessRatio > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                            {Math.round(review.helpfulnessRatio)}% found this helpful
+                        </span>
+                    )}
                 </div>
-                {review.helpfulnessRatio > 0 && (
-                    <span className="text-xs text-muted-foreground">
-                        {Math.round(review.helpfulnessRatio)}% found this helpful
-                    </span>
-                )}
-            </div>
+            )}
 
             {/* Seller/Admin Reply */}
-            {review.reply && (
+            {review.reply && !isEditing && (
                 <div className="ml-16 mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-2 mb-2">
                         <MessageSquare className="w-4 h-4 text-blue-600 mt-0.5" />

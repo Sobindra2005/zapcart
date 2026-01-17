@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
-import { flashSaleProducts } from "@/data/products";
-import { OfferProductList } from "@/components/OfferProductList";
+import { sampleProducts } from "@/data/products";
+import { OfferProductList } from "@/components/product/OfferProductList";
+
 
 interface OfferPageProps {
     params: Promise<{
@@ -19,7 +20,7 @@ export default async function OfferPage({ params }: OfferPageProps) {
     let title = "";
 
     if (slug === "flash-sale") {
-        products = flashSaleProducts;
+        products = sampleProducts;
         title = "Flash Sale";
     } else {
         return notFound();

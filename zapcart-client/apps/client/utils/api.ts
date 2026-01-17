@@ -114,6 +114,10 @@ const apiClient = {
         const response = await axiosInstance.post(endpoint, body, config);
         return response.data;
     },
+    delete: async (endpoint: string, config = {}) => {
+        const response = await axiosInstance.delete(endpoint, config);
+        return response.data;
+    }
 }
 
 export const authApi = {
@@ -154,6 +158,12 @@ export const reviewsApi = {
             }
         } : {};
         return apiClient.post('/reviews', data, config);
+    },
+    editReview: (reviewId: string, rating?: number, comment?: string, images?: string[]) => {
+        return apiClient.post(`/reviews/${reviewId}`, { rating, comment, images });
+    },
+    deleteReview: (reviewId: string) => {
+        return apiClient.delete(`/reviews/${reviewId}`);
     },
     markHelpful: (reviewId: string) => {
         return apiClient.post(`/reviews/${reviewId}/helpful`, {});
