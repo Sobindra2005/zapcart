@@ -4,8 +4,18 @@ import Image from "next/image"
 import { Button } from "@repo/ui/ui/button"
 import { MainContainer } from "./wrapper"
 import { SectionHeader } from "./SectionHeader"
+import { useQuery } from "@tanstack/react-query"
+import { productApi } from "@/utils/api"
 
 export function FeaturedProducts() {
+
+    const { data, error, isLoading } = useQuery({
+        queryKey: ['featuredProducts'],
+        queryFn: () => productApi.getProducts()
+    })
+
+    const product = data?.data?.products;
+    
     const heroProduct = {
         title: "Premium Wireless Earbuds",
         price: 129.99,
@@ -14,13 +24,14 @@ export function FeaturedProducts() {
     }
 
     const gridProducts = [
-        { title: "Portable Speaker", price: 79.99, image: "/portable-speaker.png" },
+        { title: "Portable Speaker", price: 79.99, oldPrice: 99.99, image: "/portable-speaker.png" },
         { title: "Phone Stand", price: 24.99, image: "/phone-stand.jpg" },
-        { title: "Screen Protector", price: 12.99, image: "/screen-protector.png" },
+        { title: "Screen Protector", price: 12.99, oldPrice: 19.99, image: "/screen-protector.png" },
         { title: "Power Bank", price: 49.99, image: "/portable-power-bank.png" },
-        { title: "Charger", price: 34.99, image: "/fast-charger.jpg" },
+        { title: "Charger", price: 34.99, oldPrice: 44.99, image: "/fast-charger.jpg" },
         { title: "Cable Organizer", price: 9.99, image: "/cable-organizer.png" },
     ]
+
 
     return (
         <MainContainer spacing={true}>
@@ -69,9 +80,16 @@ export function FeaturedProducts() {
                                 <h4 className="text-white font-semibold text-sm mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     {product.title}
                                 </h4>
-                                <p className="text-accent font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                    ${product.price}
-                                </p>
+                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <p className="text-accent font-bold">
+                                        ${product.price}
+                                    </p>
+                                    {product.oldPrice && (
+                                        <p className="text-white/70 text-sm line-through">
+                                            ${product.oldPrice}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     ))}

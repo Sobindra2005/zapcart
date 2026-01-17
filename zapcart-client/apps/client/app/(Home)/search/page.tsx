@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { FilterSidebar } from "@/components/search/FilterSidebar";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductCard } from "@/components/product/ProductCard";
 import { mockProducts } from "@/data/mockSearchData";
 import { Button } from "@repo/ui/ui/button";
 import { Filter } from "lucide-react";

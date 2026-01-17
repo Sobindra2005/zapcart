@@ -4,7 +4,6 @@ import {
     getAllProducts,
     getFeaturedProducts,
     getProductsByCategory,
-    searchProducts,
     getProductById,
     getRelatedProducts,
     updateProduct,
@@ -19,10 +18,8 @@ import { protect, restrictTo } from '@/middlewares/authMiddleware';
 
 const router = Router();
 
-
 // Public routes (no authentication required)
 router.get('/featured', getFeaturedProducts);
-router.get('/search', searchProducts);
 router.get('/category/:categoryId', getProductsByCategory);
 router.get('/:identifier', getProductById);
 router.get('/:id/related', getRelatedProducts);

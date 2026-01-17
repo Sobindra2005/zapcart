@@ -1,8 +1,3 @@
-import { notFound } from "next/navigation";
-import { sampleProducts } from "@/data/products";
-import { ProductImageGallery } from "@/components/ProductImageGallery";
-import { ProductInfo } from "@/components/ProductInfo";
-import { ReviewsSection } from "@/components/ReviewsSection";
 import { MainContainer } from "@/components/wrapper";
 import { getQueryClient } from "../../../../../../packages/ui/src/get-query-client";
 import { productApi, reviewsApi, systemSettingsApi } from "@/utils/api";
@@ -38,10 +33,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
         queryFn: () => reviewsApi.getReviewsByProductId(id)
     })
 
+    await queryClient.prefetchQuery({
+        queryKey: ['relatedProducts', id],
+        queryFn: () => productApi.getReleatedProducts(id)
+    })
+
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <MainContainer className="max-w-7xl">
+            <MainContainer >
                 <ProductById productId={id}/>
             </MainContainer>
         </HydrationBoundary>

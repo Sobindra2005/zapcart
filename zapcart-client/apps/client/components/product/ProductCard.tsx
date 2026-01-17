@@ -24,7 +24,7 @@ export function ProductCard({ product }: ProductCardProps) {
     };
 
     return (
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/product/${product.id || product._id}`}>
             <Card className="group overflow-hidden transition-all ">
                 <CardContent className="p-4 cursor-pointer ">
                     {/* Image Container */}

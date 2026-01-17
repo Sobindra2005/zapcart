@@ -1,7 +1,7 @@
 "use client";
 
 import { mockUser } from "@/data/mockAccountData";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductCard } from "@/components/product/ProductCard";
 import { Heart } from "lucide-react";
 import { Button } from "@repo/ui/ui/button";
 

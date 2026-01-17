@@ -5,13 +5,13 @@ import { Heart, ChevronDown, Package, Truck, Calendar, Box, Minus, Plus } from "
 import { useRouter } from "next/navigation";
 import { Button } from "@repo/ui/ui/button";
 import { Product } from "@/types/product";
-import { SizeSelector } from "./SizeSelector";
 import { cn } from "@repo/lib/utils";
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { systemSettingsApi } from "@/utils/api";
 import { ShippingSettingsDescription, SystemSetting } from "@/types/systemSetting";
+import { SizeSelector } from "../SizeSelector";
 
 interface ProductInfoProps {
     product: Product;

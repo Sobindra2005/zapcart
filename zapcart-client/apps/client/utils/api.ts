@@ -65,18 +65,18 @@ axiosInstance.interceptors.response.use(
             try {
                 // Attempt to refresh the token
                 const response = await axiosInstance.post(endpoints.refreshToken, {});
-                
+
                 if (response?.data?.data?.tokens?.accessToken) {
                     const newAccessToken = response.data.data.tokens.accessToken;
-                    
+
                     // Set the new token in httpOnly cookie
                     await setAuthToken(newAccessToken);
-                    
+
                     // Process queued requests
                     processQueue(null, newAccessToken);
-                    
+
                     isRefreshing = false;
-                    
+
                     // Retry the original request
                     return axiosInstance(originalRequest);
                 } else {
@@ -86,16 +86,16 @@ axiosInstance.interceptors.response.use(
                 // Refresh token is invalid or expired
                 processQueue(refreshError, null);
                 isRefreshing = false;
-                
+
                 // Logout user
                 await removeAuthToken();
                 useAuthStore.getState().logout();
-                
+
                 // Redirect to login page
                 if (typeof window !== 'undefined') {
                     window.location.href = '/login';
                 }
-                
+
                 return Promise.reject(refreshError);
             }
         }
@@ -137,6 +137,9 @@ export const productApi = {
     },
     getProductById: (id: string) => {
         return apiClient.get(`/products/${id}`);
+    },
+    getReleatedProducts: (id: string) => {
+        return apiClient.get(`/products/${id}/related`);
     }
 };
 
@@ -153,10 +156,10 @@ export const reviewsApi = {
         return apiClient.post('/reviews', data, config);
     },
     markHelpful: (reviewId: string) => {
-        return apiClient.post(`/reviews/${reviewId}/helpful`,{});
+        return apiClient.post(`/reviews/${reviewId}/helpful`, {});
     },
     markNotHelpful: (reviewId: string) => {
-        return apiClient.post(`/reviews/${reviewId}/not-helpful`,{});
+        return apiClient.post(`/reviews/${reviewId}/not-helpful`, {});
     }
 }
 

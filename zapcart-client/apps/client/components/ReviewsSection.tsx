@@ -18,6 +18,7 @@ import { getQueryClient } from "../../../packages/ui/src/get-query-client";
 import { Product } from "@/types/product";
 import { IProductReview } from "@/types/productReviews";
 import { selectUserId, useUserStore } from "@/stores";
+import { SectionHeader } from "./SectionHeader";
 
 // Review form validation schema
 const reviewSchema = z.object({
@@ -117,7 +118,7 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
 
         createReviewMutation.mutate(formData);
     };
-    
+
     const markHelpfulMutation = useMutation({
         mutationFn: ({ reviewId, voteType }: { reviewId: string; voteType: 'helpful' | 'notHelpful' }) => {
             return voteType === 'helpful'
@@ -137,10 +138,10 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
     };
 
     return (
-        <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-8">Rating & Reviews</h2>
+        <div >
+            <SectionHeader title="Rating & Reviews" viewAllLink="" />
 
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-12 px-4">
                 {/* Rating Summary */}
                 <div className="space-y-6">
                     <div>

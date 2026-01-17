@@ -209,45 +209,6 @@ export const getProductsByCategory = asyncHandler(async (req: Request, res: Resp
     });
 });
 
-/**
- * Search products with full-text search
- * GET /api/v1/products/search
- */
-export const searchProducts = asyncHandler(async (req: Request, res: Response) => {
-    const { q, page = 1, limit = 20 } = req.query;
-
-    if (!q) {
-        throw new AppError('Please provide a search query', 400);
-    }
-
-    const pageNum = Number(page);
-    const limitNum = Number(limit);
-    const skip = (pageNum - 1) * limitNum;
-
-    const [products, total] = await Promise.all([
-        Product.find({
-            $text: { $search: q as string },
-            status: 'active',
-        })
-            .select({ score: { $meta: 'textScore' } })
-            .sort({ score: { $meta: 'textScore' } })
-            .limit(limitNum)
-            .skip(skip)
-            .populate('category', 'name slug')
-            .lean(),
-        Product.countDocuments({
-            $text: { $search: q as string },
-            status: 'active',
-        }),
-    ]);
-
-    res.status(200).json({
-        status: 'success',
-        results: products.length,
-        total,
-        data: { products },
-    });
-});
 
 /**
  * Get a single product by ID or slug
@@ -262,12 +223,10 @@ export const getProductById = asyncHandler(async (req: Request, res: Response) =
     if (mongoose.Types.ObjectId.isValid(identifier)) {
         product = await Product.findById(identifier)
             .populate('category', 'name slug')
-            .lean();
     } else {
         // Search by slug
         product = await Product.findOne({ slug: identifier })
             .populate('category', 'name slug')
-            .lean();
     }
 
     if (!product) {
