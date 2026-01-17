@@ -2,6 +2,7 @@
 
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 interface SectionHeaderProps {
     title: string;
@@ -19,26 +20,39 @@ export function SectionHeader({
     className = "",
 }: SectionHeaderProps) {
     return (
-        <div className={`flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2 ${className}`}>
-            <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                    {title}
-                </h2>
-                {subtitle && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                        {subtitle}
-                    </p>
+        <Suspense fallback={<SectionHeaderSkeleton />}>
+            <div className={`flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2 ${className}`}>
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                        {title}
+                    </h2>
+                    {subtitle && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                            {subtitle}
+                        </p>
+                    )}
+                </div>
+                {viewAllLink && (
+                    <Link
+                        href={viewAllLink}
+                        className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors"
+                    >
+                        {viewAllText}
+                        <ArrowRight className="w-4 h-4" />
+                    </Link>
                 )}
             </div>
-            {viewAllLink && (
-                <Link
-                    href={viewAllLink}
-                    className="hidden sm:flex items-center gap-2 text-sm font-medium text-foreground hover:text-foreground/80 transition-colors"
-                >
-                    {viewAllText}
-                    <ArrowRight className="w-4 h-4" />
-                </Link>
-            )}
+        </Suspense>
+    );
+}
+
+function SectionHeaderSkeleton() {
+    return (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-2">
+            <div className="space-y-2">
+                <div className="h-10 w-48 bg-muted rounded-md animate-pulse"></div>
+            </div>
+            <div className="hidden sm:block h-5 w-20 bg-muted rounded-md animate-pulse"></div>
         </div>
     );
 }

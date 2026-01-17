@@ -10,7 +10,7 @@ import { ProductsList } from "./productList";
 
 
 export function ProductGrid() {
-    const { data } = useQuery({
+    const { data,isLoading } = useQuery({
         queryKey: ['productForYou'],
         queryFn: () => productApi.getProducts()
     })
@@ -19,7 +19,7 @@ export function ProductGrid() {
         <section className="w-full bg-background">
             <MainContainer className="container" spacing={true}>
                 <SectionHeader title="Products For You" viewAllLink="" />
-                <ProductsList products={data?.data?.products} />
+                <ProductsList products={data?.data?.products} isLoading={isLoading} />
             </MainContainer>
         </section>
     );
