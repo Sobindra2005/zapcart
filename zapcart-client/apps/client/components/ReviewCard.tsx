@@ -8,6 +8,11 @@ import { cn } from "@repo/lib/utils";
 import { format } from "date-fns";
 import { Textarea } from "@repo/ui/ui/textarea";
 import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
+import { reviewsApi } from "@/utils/api";
+
+import { toast } from "sonner";
+import { getQueryClient } from "../../../packages/ui/src/get-query-client";
 
 interface ReviewCardProps {
     review: IProductReview;
@@ -19,7 +24,7 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
     const [userVote, setUserVote] = useState<'helpful' | 'notHelpful' | null>(null);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
-    
+
     // Edit mode state grouped
     const [editState, setEditState] = useState({
         rating: review.rating,
@@ -28,12 +33,76 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
         newImageFiles: [] as File[],
         newImagePreviews: [] as string[]
     });
-    
+
     // Optimistic UI counts
     const [helpfulCount, setHelpfulCount] = useState(review.helpfulCount);
     const [notHelpfulCount, setNotHelpfulCount] = useState(review.notHelpfulCount);
 
-    // Get initials from userName
+    const queryClient = getQueryClient();
+
+    // Update review mutation
+    const updateReviewMutation = useMutation({
+        mutationFn: async () => {
+            const formData = new FormData();
+            formData.append('rating', editState.rating.toString());
+            formData.append('comment', editState.comment);
+
+            // Add existing images that weren't removed
+            editState.existingImages.forEach((img) => {
+                formData.append('existingImages', img);
+            });
+
+            console.log('Editing review with data:',  editState.existingImages)
+
+            // Add new images
+            editState.newImageFiles.forEach((file) => {
+                formData.append('images', file);
+            });
+
+            return reviewsApi.editReview(review.id, formData);
+        },
+        onSuccess: () => {
+            // Get product ID from review
+            const productId = review.product
+
+            // Invalidate queries to refetch updated data
+            queryClient.invalidateQueries({ queryKey: ['productReviews', productId] });
+            queryClient.invalidateQueries({ queryKey: ['product', productId] });
+
+            // Clean up image previews
+            editState.newImagePreviews.forEach(url => URL.revokeObjectURL(url));
+
+            setIsEditing(false);
+            setEditState(prev => ({
+                ...prev,
+                newImageFiles: [],
+                newImagePreviews: []
+            }));
+
+            toast.success('Review updated successfully');
+        },
+        onError: (error: any) => {
+            console.error('Error updating review:', error);
+            toast.error(error?.response?.data?.message || 'Failed to update review');
+        }
+    });
+
+    const deleteReviewMutation = useMutation({
+        mutationFn: () => reviewsApi.deleteReview(review.id),
+        onSuccess: () => {
+            const productId = review.product
+
+            queryClient.invalidateQueries({ queryKey: ['productReviews', productId] });
+            queryClient.invalidateQueries({ queryKey: ['product', productId] });
+
+            toast.success('Review deleted successfully');
+        },
+        onError: (error: any) => {
+            console.error('Error deleting review:', error);
+            toast.error(error?.response?.data?.message || 'Failed to delete review');
+        }
+    });
+
     const getInitials = (name: string) => {
         const parts = name.split(' ');
         if (parts.length >= 2) {
@@ -102,21 +171,17 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
     };
 
     const handleSaveEdit = async () => {
-        // TODO: Implement API call to update review
-        console.log("Save edited review:", {
-            reviewId: review.id,
-            rating: editState.rating,
-            comment: editState.comment,
-            newImages: editState.newImageFiles
-        });
-        
-        // For now, just exit edit mode
-        setIsEditing(false);
-        setEditState(prev => ({
-            ...prev,
-            newImageFiles: [],
-            newImagePreviews: []
-        }));
+        if (editState.comment.trim().length < 10) {
+            toast.error('Review must be at least 10 characters');
+            return;
+        }
+
+        if (editState.rating === 0) {
+            toast.error('Please select a rating');
+            return;
+        }
+
+        updateReviewMutation.mutate();
     };
 
     const handleRemoveExistingImage = (imageUrl: string) => {
@@ -154,9 +219,8 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
     };
 
     const handleDeleteReview = () => {
-        // TODO: Implement delete functionality
         if (confirm("Are you sure you want to delete this review?")) {
-            console.log("Delete review:", review.id);
+            deleteReviewMutation.mutate();
         }
     };
 
@@ -168,9 +232,9 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
             <div className="flex items-start gap-4 mb-3">
                 <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center shrink-0">
                     {review?.user?.avatar ? (
-                        <img 
-                            src={review.user.avatar} 
-                            alt={review.user.name} 
+                        <img
+                            src={review.user.avatar}
+                            alt={review.user.name}
                             className="w-full h-full rounded-full object-cover"
                         />
                     ) : (
@@ -221,17 +285,16 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
                         {[...Array(5)].map((_, i) => (
                             <Star
                                 key={i}
-                                className={`w-4 h-4 ${
-                                    i < review.rating
+                                className={`w-4 h-4 ${i < review.rating
                                         ? "fill-yellow-400 text-yellow-400"
                                         : "fill-gray-300 text-gray-300"
-                                }`}
+                                    }`}
                             />
                         ))}
                     </div>
                 </div>
             </div>
-            
+
             {isEditing ? (
                 // Edit Mode
                 <div className="ml-16 space-y-4">
@@ -273,7 +336,7 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
                     {/* Images Edit */}
                     <div>
                         <label className="text-sm font-medium mb-2 block">Images</label>
-                        
+
                         {/* Existing Images */}
                         {editState.existingImages.length > 0 && (
                             <div className="flex gap-2 flex-wrap mb-3">
@@ -347,21 +410,30 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
 
                     {/* Action Buttons */}
                     <div className="flex gap-3 pt-2">
-                        <Button onClick={handleSaveEdit} size="sm">
-                            Save Changes
+                        <Button
+                            onClick={handleSaveEdit}
+                            size="sm"
+                            disabled={updateReviewMutation.isPending}
+                        >
+                            {updateReviewMutation.isPending ? 'Saving...' : 'Save Changes'}
                         </Button>
-                        <Button onClick={handleCancelEdit} variant="outline" size="sm">
+                        <Button
+                            onClick={handleCancelEdit}
+                            variant="outline"
+                            size="sm"
+                            disabled={updateReviewMutation.isPending}
+                        >
                             Cancel
                         </Button>
                     </div>
                 </div>
             ) : (
                 // View Mode
-                <>
+                <div>
                     {review.title && (
                         <h5 className="font-semibold text-base mb-2 ml-16">{review.title}</h5>
                     )}
-                    
+
                     <p className="text-sm text-gray-600 leading-relaxed ml-16 mb-4">{review.comment}</p>
 
                     {/* Review Images */}
@@ -380,12 +452,12 @@ export function ReviewCard({ review, onVoteHelpful, authorReview }: ReviewCardPr
                             </div>
                         </div>
                     )}
-                </>
+                </div>
             )}
 
             {/* Image Preview Modal */}
             {previewImage && (
-                <div 
+                <div
                     className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
                     onClick={() => setPreviewImage(null)}
                 >

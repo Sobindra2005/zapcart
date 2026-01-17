@@ -29,7 +29,7 @@ router.use(protect);
 // Authenticated user routes
 router.post('/', upload.array('images', 5), createReview);
 router.get('/user/me', getUserReviews);
-router.put('/:id', updateReview);
+router.put('/:id', upload.array('images', 5), updateReview);
 router.delete('/:id', deleteReview);
 router.post('/:id/helpful', markReviewHelpful);
 router.post('/:id/not-helpful', markReviewNotHelpful);

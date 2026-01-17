@@ -149,7 +149,7 @@ export const getReviewById = asyncHandler(async (req: Request, res: Response) =>
     const review = await ProductReview.findById(id)
         .populate('user', 'name email')
         .populate('product', 'name slug images');
- 
+
     if (!review) {
         throw new AppError('Review not found', 404);
     }
@@ -239,7 +239,8 @@ export const getUserReviews = asyncHandler(async (req: Request, res: Response) =
 export const updateReview = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
-    const { rating, comment, images } = req.body;
+    const { rating, comment, existingImages } = req.body;
+    const newImages = req.files as Express.Multer.File[];
 
     const review = await ProductReview.findById(id);
 
@@ -255,7 +256,15 @@ export const updateReview = asyncHandler(async (req: Request, res: Response) => 
     // Update fields
     if (rating !== undefined) review.rating = rating;
     if (comment !== undefined) review.comment = comment;
-    if (images !== undefined) review.images = images;
+    
+    // Handle images: combine existing images with new uploads
+    if (existingImages !== undefined || newImages) {
+        const existingImageUrls = existingImages ? existingImages : [];
+        const newImageUrls = newImages ? newImages.map(file => file.path) : [];
+        
+        // Combine existing and new images
+        review.images = [...existingImageUrls, ...newImageUrls];
+    }
 
     await review.save();
 

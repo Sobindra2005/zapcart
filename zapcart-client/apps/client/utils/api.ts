@@ -117,7 +117,11 @@ const apiClient = {
     delete: async (endpoint: string, config = {}) => {
         const response = await axiosInstance.delete(endpoint, config);
         return response.data;
-    }
+    },
+    put: async (endpoint: string, body: any, config = {}) => {
+        const response = await axiosInstance.put(endpoint, body, config);
+        return response.data;
+    }   
 }
 
 export const authApi = {
@@ -159,8 +163,13 @@ export const reviewsApi = {
         } : {};
         return apiClient.post('/reviews', data, config);
     },
-    editReview: (reviewId: string, rating?: number, comment?: string, images?: string[]) => {
-        return apiClient.post(`/reviews/${reviewId}`, { rating, comment, images });
+    editReview: (reviewId: string, data: FormData | { rating?: number; comment?: string; images?: string[] }) => {
+        const config = data instanceof FormData ? {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        } : {};
+        return apiClient.put(`/reviews/${reviewId}`, data, config);
     },
     deleteReview: (reviewId: string) => {
         return apiClient.delete(`/reviews/${reviewId}`);

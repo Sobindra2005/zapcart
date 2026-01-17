@@ -19,6 +19,7 @@ import { Product } from "@/types/product";
 import { IProductReview } from "@/types/productReviews";
 import {  selectUserId, useUserStore } from "@/stores";
 import { SectionHeader } from "./SectionHeader";
+import { toast } from "sonner";
 
 // Review form validation schema
 const reviewSchema = z.object({
@@ -97,6 +98,8 @@ export function ReviewsSection({ productId }: ReviewsSectionProps) {
             queryClient.invalidateQueries({ queryKey: ['product', productId] });
 
             imagePreviews.forEach(url => URL.revokeObjectURL(url));
+
+            toast.success("Review submitted successfully!");
 
             form.reset();
             setShowReviewForm(false);
