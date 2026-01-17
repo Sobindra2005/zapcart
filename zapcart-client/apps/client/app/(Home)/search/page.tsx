@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import { FilterSidebar } from "@/components/search/FilterSidebar";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductCard } from "@/components/product/ProductCard";
 import { mockProducts } from "@/data/mockSearchData";
 import { Button } from "@repo/ui/ui/button";
 import { Filter } from "lucide-react";
@@ -37,8 +37,8 @@ export default function SearchPage() {
             }
 
             // Price Filter
-            if (filters.minPrice !== "" && product.price < filters.minPrice) return false;
-            if (filters.maxPrice !== "" && product.price > filters.maxPrice) return false;
+            if (filters.minPrice !== "" && product.basePrice < filters.minPrice) return false;
+            if (filters.maxPrice !== "" && product.basePrice > filters.maxPrice) return false;
 
             // Rating Filter
             if (filters.minRating !== null && product.rating < filters.minRating) return false;

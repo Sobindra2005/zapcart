@@ -12,8 +12,10 @@ interface ProductCardProps {
     product: Product;
 }
 
+
 export function ProductCard({ product }: ProductCardProps) {
     const [isFavorite, setIsFavorite] = useState(false);
+    const [imageError, setImageError] = useState(false);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -22,14 +24,23 @@ export function ProductCard({ product }: ProductCardProps) {
     };
 
     return (
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/product/${product.id || product._id}`}>
             <Card className="group overflow-hidden transition-all ">
                 <CardContent className="p-4 cursor-pointer ">
                     {/* Image Container */}
                     <div className="relative aspect-square mb-4 bg-gray-50 rounded-lg overflow-hidden">
                         {/* Placeholder for product image */}
                         <div className="w-full h-full flex items-center justify-center  from-gray-100 to-gray-200">
-                            <span className="text-gray-400 text-sm">Product Image</span>
+                            {product.thumbnail && !imageError ? (
+                                <img
+                                    src={product.thumbnail}
+                                    alt={product.name}
+                                    className="object-cover w-full h-full"
+                                    onError={() => setImageError(true)}
+                                />
+                            ) : (
+                                <span className="text-gray-400 text-sm">No Image</span>
+                            )}
                         </div>
 
                         {/* Wishlist Button */}
@@ -53,14 +64,30 @@ export function ProductCard({ product }: ProductCardProps) {
 
                         {/* Price */}
                         <div className="flex items-center justify-between">
-                            <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+                            {product.discountPercentage && product.compareAtPrice ? (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg font-bold">
+                                        ${product.basePrice?.toFixed(2)}
+                                    </span>
+                                    <span className="text-sm line-through text-muted-foreground">
+                                        ${product.compareAtPrice?.toFixed(2)}
+                                    </span>
+                                    <span className="text-xs text-red-500 font-semibold">
+                                        -{product.discountPercentage}%
+                                    </span>
+                                </div>
+                            ) : (
+                                <span className="text-lg font-bold">
+                                    ${product.basePrice?.toFixed(2)}
+                                </span>
+                            )}
 
                             {/* Rating */}
-                            {product.rating > 0 && (
+                            {(product.averageRating ?? 0) > 0 && (
                                 <div className="flex items-center gap-1">
                                     <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                    <span className="text-sm font-medium">{product.rating}</span>
-                                    {product.reviewCount > 0 && (
+                                    <span className="text-sm font-medium">{product.averageRating ?? 0}</span>
+                                    {(product.reviewCount ?? 0) > 0 && (
                                         <span className="text-xs text-muted-foreground">({product.reviewCount})</span>
                                     )}
                                 </div>

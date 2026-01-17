@@ -74,19 +74,19 @@ export function FlashSaleCard() {
 
                                 {/* Countdown Timer */}
                                 <div className="flex items-center gap-3">
-                                    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3 min-w-[70px]">
+                                    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3 min-w-17.5">
                                         <span className="text-3xl font-bold">
                                             {String(timeLeft.hours).padStart(2, "0")}
                                         </span>
                                         <span className="text-xs font-medium uppercase">Hours</span>
                                     </div>
-                                    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3 min-w-[70px]">
+                                    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3 min-w-17.5">
                                         <span className="text-3xl font-bold">
                                             {String(timeLeft.minutes).padStart(2, "0")}
                                         </span>
                                         <span className="text-xs font-medium uppercase">Minutes</span>
                                     </div>
-                                    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3 min-w-[70px]">
+                                    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm rounded-lg px-4 py-3 min-w-17.5">
                                         <span className="text-3xl font-bold">
                                             {String(timeLeft.seconds).padStart(2, "0")}
                                         </span>
@@ -104,7 +104,7 @@ export function FlashSaleCard() {
 
                             {/* Right Side - Product Image */}
                             <div className="relative flex items-center justify-center">
-                                <div className="relative w-full h-[300px] lg:h-[400px]">
+                                <div className="relative w-full h-75 lg:h-100">
                                     {/* <Image
                                         src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"
                                         alt="Featured Product"

@@ -1,5 +1,6 @@
 import express from 'express';
-import { signup, login, refreshAccessToken, logout } from '@/controllers/auth.controller';
+import { signup, login, refreshAccessToken, logout, updateProfile } from '@/controllers/auth.controller';
+
 
 const router = express.Router();
 
@@ -13,6 +14,14 @@ const router = express.Router();
  * @access  Public
  */
 router.post('/signup', signup);
+
+/**
+ * @route   PATCH /api/v1/auth/update-profile
+ * @desc    Update user profile (name, email, avatar, etc. except password)
+ * @access  Private (requires authentication)
+ */
+router.patch('/update-profile', updateProfile);
+
 
 /**
  * @route   POST /api/v1/auth/login
@@ -34,5 +43,7 @@ router.post('/refresh-token', refreshAccessToken);
  * @access  Public
  */
 router.post('/logout', logout);
+
+
 
 export default router;

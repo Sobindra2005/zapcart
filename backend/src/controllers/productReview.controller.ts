@@ -3,6 +3,7 @@ import asyncHandler from '@/utils/asyncHandler';
 import AppError from '@/utils/AppError';
 import ProductReview, { IProductReview } from '@/models/ProductReview';
 import mongoose from 'mongoose';
+import { prisma } from '@/config/prisma';
 
 /**
  * Get all reviews for a product
@@ -26,7 +27,7 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
     // Build sort object with string keys for MongoDB
     type MongoSortOrder = 1 | -1;
     const sortOption: Record<string, MongoSortOrder> = {};
-    
+
 
     if (sort === 'createdAt') {
         sortOption.createdAt = -1;
@@ -48,6 +49,7 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
         rating: rating ? Number(rating) : null,
         verifiedOnly: verifiedOnly === 'true',
     });
+
 
     interface ReviewQuery {
         product: string;
@@ -71,13 +73,49 @@ export const getProductReviews = asyncHandler(async (req: Request, res: Response
 
     const total = await ProductReview.countDocuments(query);
 
+    const userIds = [...new Set(reviews.map(review => review.user))];
+
+    // Fetch user details from Prisma in one query
+    const users = await prisma.user.findMany({
+        where: {
+            id: { in: userIds }
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            avatar: true
+        }
+    });
+
+    // Create a map for quick user lookup
+    const userMap = new Map(
+        users.map(user => [
+            user.id,
+            {
+                name: `${user.firstName} ${user.lastName}`,
+                avatar: user.avatar,
+                id: user.id
+            }
+        ])
+    );
+
+    // Enrich reviews with user data
+    const enrichedReviews = reviews.map(review => {
+        const reviewObj = review.toObject();
+        return {
+            ...reviewObj,
+            user: userMap.get(review.user) || { name: 'Unknown User', avatar: null }
+        };
+    });
+
     res.status(200).json({
         status: 'success',
-        results: reviews.length,
+        results: enrichedReviews.length,
         total,
         page: pageNum,
         pages: Math.ceil(total / limitNum),
-        data: { reviews },
+        data: { reviews: enrichedReviews },
     });
 });
 
@@ -128,28 +166,30 @@ export const getReviewById = asyncHandler(async (req: Request, res: Response) =>
  */
 export const createReview = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user!.id;
-    const { product, rating, title, comment, images, orderId } = req.body;
+    const { product, rating, comment, orderId } = req.body;
+    const images = req.files as Express.Multer.File[];
 
+    console.log('Uploaded images:', images);
+
+    const imageUrls = images ? images.map(file => file.path) : [];
     // Validation
     if (!product || !rating || !comment) {
         throw new AppError('Please provide product, rating, and comment', 400);
     }
 
     // Check if user has already reviewed this product
-    const hasReviewed = await ProductReview.hasUserReviewed(userId.toString(), product);
+    const hasReviewed = await ProductReview.hasUserReviewed(userId, product);
     if (hasReviewed) {
         throw new AppError('You have already reviewed this product', 400);
     }
 
     // Create review
-    // @ts-expect-error - Mongoose typing limitation with custom fields
     const review = (await ProductReview.create({
         product,
         user: userId,
         rating,
-        title,
         comment,
-        images,
+        images: imageUrls,
         orderId,
     })) as IProductReview;
 
@@ -175,12 +215,12 @@ export const getUserReviews = asyncHandler(async (req: Request, res: Response) =
     const limitNum = Number(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    const reviews = await ProductReview.getUserReviews(userId.toString(), {
+    const reviews = await ProductReview.getUserReviews(userId, {
         limit: limitNum,
         skip,
     });
 
-    const total = await ProductReview.countDocuments({ user: userId.toString() });
+    const total = await ProductReview.countDocuments({ user: userId });
 
     res.status(200).json({
         status: 'success',
@@ -199,7 +239,8 @@ export const getUserReviews = asyncHandler(async (req: Request, res: Response) =
 export const updateReview = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
-    const { rating, title, comment, images } = req.body;
+    const { rating, comment, existingImages } = req.body;
+    const newImages = req.files as Express.Multer.File[];
 
     const review = await ProductReview.findById(id);
 
@@ -214,9 +255,16 @@ export const updateReview = asyncHandler(async (req: Request, res: Response) => 
 
     // Update fields
     if (rating !== undefined) review.rating = rating;
-    if (title !== undefined) review.title = title;
     if (comment !== undefined) review.comment = comment;
-    if (images !== undefined) review.images = images;
+    
+    // Handle images: combine existing images with new uploads
+    if (existingImages !== undefined || newImages) {
+        const existingImageUrls = existingImages ? existingImages : [];
+        const newImageUrls = newImages ? newImages.map(file => file.path) : [];
+        
+        // Combine existing and new images
+        review.images = [...existingImageUrls, ...newImageUrls];
+    }
 
     await review.save();
 
@@ -269,7 +317,7 @@ export const markReviewHelpful = asyncHandler(async (req: Request, res: Response
     }
 
     // Use instance method to mark as helpful
-    await review.markHelpful(userId.toString());
+    await review.markHelpful(userId);
 
     res.status(200).json({
         status: 'success',
@@ -286,6 +334,7 @@ export const markReviewHelpful = asyncHandler(async (req: Request, res: Response
  */
 export const markReviewNotHelpful = asyncHandler(async (req: Request, res: Response) => {
     const { id } = req.params;
+    const userId = req.user!.id;
 
     const review = await ProductReview.findById(id);
 
@@ -294,7 +343,7 @@ export const markReviewNotHelpful = asyncHandler(async (req: Request, res: Respo
     }
 
     // Use instance method to mark as not helpful
-    await review.markNotHelpful();
+    await review.markNotHelpful(userId);
 
     res.status(200).json({
         status: 'success',
@@ -325,7 +374,7 @@ export const addReplyToReview = asyncHandler(async (req: Request, res: Response)
     }
 
     // Use instance method to add reply
-    await review.addReply(content, userId.toString());
+    await review.addReply(content, userId);
 
     res.status(200).json({
         status: 'success',

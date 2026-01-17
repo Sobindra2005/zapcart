@@ -4,77 +4,157 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Star, X } from "lucide-react";
-import { Review } from "@/types/product";
+import { Star, Upload, X } from "lucide-react";
+import Image from "next/image";
 import { ReviewCard } from "./ReviewCard";
 import { Button } from "@repo/ui/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@repo/ui/ui/form";
-import { Input } from "@repo/ui/ui/input";
 import { Textarea } from "@repo/ui/ui/textarea";
 import { cn } from "@repo/lib/utils";
-import {motion} from "framer-motion"
+import { motion } from "framer-motion"
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { reviewsApi } from "@/utils/api";
+import { getQueryClient } from "../../../packages/ui/src/get-query-client";
+import { Product } from "@/types/product";
+import { IProductReview } from "@/types/productReviews";
+import {  selectUserId, useUserStore } from "@/stores";
+import { SectionHeader } from "./SectionHeader";
+import { toast } from "sonner";
 
 // Review form validation schema
 const reviewSchema = z.object({
     rating: z.number().min(1, "Please select a rating").max(5),
-    title: z.string().min(3, "Title must be at least 3 characters").max(100, "Title must be less than 100 characters"),
     comment: z.string().min(10, "Review must be at least 10 characters").max(500, "Review must be less than 500 characters"),
+    images: z.array(z.string()).optional(),
 });
 
 type ReviewFormData = z.infer<typeof reviewSchema>;
 
 interface ReviewsSectionProps {
-    rating: number;
-    reviewCount: number;
-    reviews: Review[];
+    productId: string;
 }
 
-export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionProps) {
+export function ReviewsSection({ productId }: ReviewsSectionProps) {
     const [showReviewForm, setShowReviewForm] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     const form = useForm<ReviewFormData>({
         resolver: zodResolver(reviewSchema),
         defaultValues: {
             rating: 0,
-            title: "",
             comment: "",
+            images: [],
         },
     });
 
-    // Calculate rating breakdown
+    const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        const newFiles = [...selectedImages, ...files].slice(0, 5);
+        setSelectedImages(newFiles);
+
+        // Create preview URLs
+        const newPreviews = newFiles.map(file => URL.createObjectURL(file));
+        setImagePreviews(newPreviews);
+    };
+
+    const handleRemoveImage = (index: number) => {
+        const newImages = selectedImages.filter((_, i) => i !== index);
+        const newPreviews = imagePreviews.filter((_, i) => i !== index);
+
+        // Revoke the URL to free memory
+        URL.revokeObjectURL(imagePreviews[index]);
+
+        setSelectedImages(newImages);
+        setImagePreviews(newPreviews);
+    };
+
+    const { data } = useQuery({
+        queryKey: ['productReviews', productId],
+        queryFn: () => reviewsApi.getReviewsByProductId(productId)
+    })
+
+    const queryClient = getQueryClient();
+
+    const product = queryClient.getQueryData<{ data: { product: Product } }>(['product', productId])?.data.product as Product;
+
+    const reviewCount = data?.data.reviews.length || 0;
+    const reviews: IProductReview[] = data?.data.reviews || [];
+
     const ratingBreakdown = [5, 4, 3, 2, 1].map(stars => {
         const count = reviews.filter(r => r.rating === stars).length;
         const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
         return { stars, count, percentage };
     });
 
-    const handleSubmitReview = (data: ReviewFormData) => {
-        console.log("Review submitted:", {
-            ...data,
-            userId: "mock-user-id",
-            userName: "Current User",
-            date: new Date().toISOString(),
-            id: crypto.randomUUID(),
+    const userId = selectUserId(useUserStore())
+
+    const createReviewMutation = useMutation({
+        mutationFn: reviewsApi.createReview,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['productReviews', productId] });
+            queryClient.invalidateQueries({ queryKey: ['product', productId] });
+
+            imagePreviews.forEach(url => URL.revokeObjectURL(url));
+
+            toast.success("Review submitted successfully!");
+
+            form.reset();
+            setShowReviewForm(false);
+            setSelectedImages([]);
+            setImagePreviews([]);
+        },
+        onError: (error) => {
+            console.error("Error submitting review:", error);
+        }
+    });
+
+    const handleSubmitReview = async (data: ReviewFormData) => {
+        const formData = new FormData();
+        formData.append('product', productId);
+        formData.append('rating', data.rating.toString());
+        formData.append('comment', data.comment);
+
+        selectedImages.forEach((file) => {
+            formData.append('images', file);
         });
 
-        // Reset form and hide it
-        form.reset();
-        setShowReviewForm(false);
+        createReviewMutation.mutate(formData);
+    };
+
+    const markHelpfulMutation = useMutation({
+        mutationFn: ({ reviewId, voteType }: { reviewId: string; voteType: 'helpful' | 'notHelpful' }) => {
+            return voteType === 'helpful'
+                ? reviewsApi.markHelpful(reviewId)
+                : reviewsApi.markNotHelpful(reviewId);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['productReviews', productId] });
+        },
+        onError: (error) => {
+            console.error("Error voting on review:", error);
+        }
+    });
+
+    const handleVoteHelpful = (reviewId: string, voteType: 'helpful' | 'notHelpful') => {
+        markHelpfulMutation.mutate({ reviewId, voteType });
     };
 
     return (
-        <div className="mt-12">
-            <h2 className="text-2xl font-bold mb-8">Rating & Reviews</h2>
+        <div >
+            <SectionHeader title="Rating & Reviews" viewAllLink="" />
 
-            <div className="grid md:grid-cols-2 gap-12">
+            <div className="grid md:grid-cols-2 gap-12 px-4">
                 {/* Rating Summary */}
                 <div className="space-y-6">
                     <div>
                         <div className="flex items-baseline gap-2 mb-2">
-                            <span className="text-6xl font-bold">{rating.toFixed(1)}</span>
+                            <span className="text-6xl font-bold">{product.averageRating.toFixed(1)}</span>
                             <span className="text-2xl text-muted-foreground">/5</span>
                         </div>
-                        <p className="text-sm text-muted-foreground">({reviewCount} New Reviews)</p>
+                        <p className="text-sm text-muted-foreground">({reviewCount} Reviews)</p>
                     </div>
 
                     {/* Rating Breakdown */}
@@ -86,8 +166,8 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
                                         <Star
                                             key={i}
                                             className={`w-3.5 h-3.5 ${i < stars
-                                                    ? "fill-yellow-400 text-yellow-400"
-                                                    : "fill-gray-300 text-gray-300"
+                                                ? "fill-yellow-400 text-yellow-400"
+                                                : "fill-gray-300 text-gray-300"
                                                 }`}
                                         />
                                     ))}
@@ -118,7 +198,7 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
 
                     {/* Review Form */}
                     {showReviewForm && (
-                        <motion.div 
+                        <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
@@ -162,24 +242,6 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
                                         )}
                                     />
 
-                                    {/* Title Field */}
-                                    <FormField
-                                        control={form.control}
-                                        name="title"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel>Review Title *</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        placeholder="Summarize your review"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-
                                     {/* Comment Field */}
                                     <FormField
                                         control={form.control}
@@ -190,7 +252,7 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder="Share your experience with this product..."
-                                                        className="min-h-[120px] resize-none"
+                                                        className="min-h-30 resize-none"
                                                         {...field}
                                                     />
                                                 </FormControl>
@@ -199,9 +261,71 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
                                         )}
                                     />
 
+                                    {/* Image Upload Field */}
+                                    <FormField
+                                        control={form.control}
+                                        name="images"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel>Images (Optional)</FormLabel>
+                                                <FormControl>
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center gap-4">
+                                                            <label
+                                                                htmlFor="review-images"
+                                                                className="flex items-center gap-2 px-4 py-2 border border-input rounded-md cursor-pointer hover:bg-muted transition-colors"
+                                                            >
+                                                                <Upload className="w-4 h-4" />
+                                                                <span className="text-sm">Upload Images</span>
+                                                            </label>
+                                                            <input
+                                                                id="review-images"
+                                                                type="file"
+                                                                accept="image/*"
+                                                                multiple
+                                                                onChange={handleImageSelect}
+                                                                className="hidden"
+                                                            />
+                                                            <span className="text-xs text-muted-foreground">
+                                                                Max 5 images
+                                                            </span>
+                                                        </div>
+
+                                                        {/* Image Previews */}
+                                                        {imagePreviews.length > 0 && (
+                                                            <div className="grid grid-cols-5 gap-3">
+                                                                {imagePreviews.map((preview, index) => (
+                                                                    <div
+                                                                        key={index}
+                                                                        className="relative aspect-square rounded-lg overflow-hidden border border-border group"
+                                                                    >
+                                                                        <Image
+                                                                            src={preview}
+                                                                            alt={`Preview ${index + 1}`}
+                                                                            fill
+                                                                            className="object-cover"
+                                                                        />
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleRemoveImage(index)}
+                                                                            className="absolute top-1 right-1 p-1 bg-black/70 hover:bg-black text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                        >
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
                                     <div className="flex justify-end gap-3 pt-2">
-                                        <Button type="submit">
-                                            Submit Review
+                                        <Button type="submit" disabled={createReviewMutation.isPending}>
+                                            {createReviewMutation.isPending ? "Submitting..." : "Submit Review"}
                                         </Button>
                                     </div>
                                 </form>
@@ -212,7 +336,12 @@ export function ReviewsSection({ rating, reviewCount, reviews }: ReviewsSectionP
                     <div className="space-y-0">
                         {reviews.length > 0 ? (
                             reviews.map((review) => (
-                                <ReviewCard key={review.id} review={review} />
+                                <ReviewCard
+                                    authorReview={userId === review.user.id}
+                                    key={review.id}
+                                    review={review}
+                                    onVoteHelpful={handleVoteHelpful}
+                                />
                             ))
                         ) : (
                             <p className="text-muted-foreground text-center py-8">

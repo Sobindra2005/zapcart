@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Product } from "@/types/product";
-import { ProductCard } from "@/components/ProductCard";
-import { MainContainer } from "./wrapper";
+import { ProductCard } from "@/components/product/ProductCard";
+
 import { SortSelect, SortOption } from "@repo/ui/SortSelect";
+import { MainContainer } from "../wrapper";
 
 // Custom sort options for offers page
 const offerSortOptions: SortOption[] = [
@@ -25,9 +26,9 @@ export function OfferProductList({ title, products }: OfferProductListProps) {
         const sorted = [...products];
         switch (sortOption) {
             case "price-asc":
-                return sorted.sort((a, b) => a.price - b.price);
+                return sorted.sort((a, b) => a.basePrice - b.basePrice);
             case "price-desc":
-                return sorted.sort((a, b) => b.price - a.price);
+                return sorted.sort((a, b) => b.basePrice - a.basePrice);
             default:
                 return sorted; // "relevance" or default order
         }

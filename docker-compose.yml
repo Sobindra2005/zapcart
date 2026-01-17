@@ -62,6 +62,15 @@ services:
     volumes:
       - ./backend/src:/app/src
       - ./backend/dist:/app/dist
+    develop:
+      watch:
+        - action: sync
+          path: ./backend/src
+          target: /app/src
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ./backend/package.json
 
   # Nginx reverse proxy
   nginx:

@@ -9,6 +9,13 @@ export interface CartItem {
     image: string;
     quantity: number;
     size?: string;
+    variant?: variant;
+}
+
+interface variant {
+    sku: string;
+    color: string;
+    material: string;
 }
 
 interface CartContextType {
@@ -29,7 +36,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const addToCart = (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
         setItems((prevItems) => {
             const existingItem = prevItems.find((i) => i.id === item.id && i.size === item.size);
-            
+
             if (existingItem) {
                 return prevItems.map((i) =>
                     i.id === item.id && i.size === item.size
@@ -37,7 +44,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                         : i
                 );
             }
-            
+
             return [...prevItems, { ...item, quantity: item.quantity || 1 }];
         });
     };
@@ -51,7 +58,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             removeFromCart(id);
             return;
         }
-        
+
         setItems((prevItems) =>
             prevItems.map((item) =>
                 item.id === id ? { ...item, quantity } : item

@@ -6,16 +6,18 @@ import { Button } from "@repo/ui/ui/button";
 import { Input } from "@repo/ui/ui/input";
 import { User as UserIcon, Mail, Phone, Camera } from "lucide-react";
 import Image from "next/image";
+import { useUserStore } from "@/stores";
 
 export default function AccountPage() {
+    const userDetails = useUserStore((state) => state.user);
     const [isEditing, setIsEditing] = useState(false);
     const [user, setUser] = useState(mockUser);
 
-    // Mock save handler
+
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
         setIsEditing(false);
-        // In a real app, API call here
+
     };
 
     return (

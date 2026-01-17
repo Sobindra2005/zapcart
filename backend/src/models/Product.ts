@@ -86,7 +86,6 @@ export interface IProduct extends Document {
 
   // Instance methods
   incrementViews(): Promise<this>;
-  updateRating(newRating: number, isNew?: boolean): Promise<this>;
 }
 
 // Product Model Interface with static methods
@@ -417,7 +416,8 @@ ProductSchema.statics.findFeatured = function (limit: number = 10) {
   })
     .sort({ salesCount: -1, averageRating: -1 })
     .limit(limit)
-    .populate('category');
+    .populate('category')
+    .select('-costPrice');
 };
 
 // Static method to find products by category
@@ -436,18 +436,6 @@ ProductSchema.statics.findByCategory = function (categoryId: string, options: { 
 // Instance method to increment view count
 ProductSchema.methods.incrementViews = function () {
   this.viewCount += 1;
-  return this.save();
-};
-
-// Instance method to update rating
-ProductSchema.methods.updateRating = function (newRating: number, isNew: boolean = true) {
-  if (isNew) {
-    this.averageRating = ((this.averageRating * this.reviewCount) + newRating) / (this.reviewCount + 1);
-    this.reviewCount += 1;
-  } else {
-    // For rating updates, recalculate separately
-    this.averageRating = newRating;
-  }
   return this.save();
 };
 

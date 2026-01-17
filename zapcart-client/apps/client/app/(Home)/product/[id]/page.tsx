@@ -1,9 +1,8 @@
-import { notFound } from "next/navigation";
-import { sampleProducts } from "@/data/products";
-import { ProductImageGallery } from "@/components/ProductImageGallery";
-import { ProductInfo } from "@/components/ProductInfo";
-import { ReviewsSection } from "@/components/ReviewsSection";
 import { MainContainer } from "@/components/wrapper";
+import { getQueryClient } from "../../../../../../packages/ui/src/get-query-client";
+import { productApi, reviewsApi, systemSettingsApi } from "@/utils/api";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import { ProductById } from "./productById";
 
 interface ProductPageProps {
     params: Promise<{
@@ -13,35 +12,38 @@ interface ProductPageProps {
 
 export default async function ProductPage({ params }: ProductPageProps) {
     const { id } = await params;
-    const product = sampleProducts.find((p) => p.id === id);
 
-    if (!product) {
-        notFound();
-    }
+    const queryClient = getQueryClient();
 
-    // Default images if not provided
-    const images = product.images || [product.image, product.image, product.image, product.image];
+    await queryClient.prefetchQuery({
+        queryKey: ['systemSettings'],
+        queryFn: async () => {
+            const response = await systemSettingsApi.getSettings()
+            return response.data;
+        }
+    })
+
+    await queryClient.prefetchQuery({
+        queryKey: ['product', id],
+        queryFn: () => productApi.getProductById(id)
+    })
+
+    await queryClient.prefetchQuery({
+        queryKey: ['productReviews', id],
+        queryFn: () => reviewsApi.getReviewsByProductId(id)
+    })
+
+    await queryClient.prefetchQuery({
+        queryKey: ['relatedProducts', id],
+        queryFn: () => productApi.getReleatedProducts(id)
+    })
+
 
     return (
-        <MainContainer className="max-w-7xl">
-            <div className="py-8 md:py-12">
-                <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-                    {/* Left: Image Gallery */}
-                    <ProductImageGallery images={images}  />
-
-                    {/* Right: Product Info */}
-                    <ProductInfo product={product} />
-                </div>
-
-                {/* Reviews Section */}
-                {product.reviews && product.reviews.length > 0 && (
-                    <ReviewsSection
-                        rating={product.rating}
-                        reviewCount={product.reviewCount}
-                        reviews={product.reviews}
-                    />
-                )}
-            </div>
-        </MainContainer>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+            <MainContainer >
+                <ProductById productId={id}/>
+            </MainContainer>
+        </HydrationBoundary>
     );
 }

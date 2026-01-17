@@ -31,6 +31,7 @@ model User {
   firstName     String
   lastName      String
   phone         String?
+  avatar        String?
   role          UserRole      @default(CUSTOMER)
   status        UserStatus    @default(ACTIVE)
   emailVerified Boolean       @default(false)
@@ -357,12 +358,18 @@ model InventoryLog {
 // ===========================
 // SYSTEM SETTINGS
 // ===========================
+enum SystemSettingKey {
+  ESTIMATED_DELIVERY_DAYS
+  SHIPPING_INFO
+  SUPPORT_EMAIL
+  MAINTENANCE_MODE
+}
 
 model SystemSetting {
   id          Int      @id @default(autoincrement())
-  key         String   @unique
-  value       String
-  description String?
+  key         String   @unique 
+  value       String?
+  description Json?
   
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())

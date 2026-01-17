@@ -7,17 +7,13 @@ import routes from '@/routes/index';
 import errorHandler from '@/middlewares/errorHandler';
 import AppError from '@/utils/AppError';
 import './workers/searchIndexWork.ts'
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
-
-/**
- * SECURITY MIDDLEWARES
- */
-
 // Set security HTTP headers
 app.use(helmet());
-
+app.use(cookieParser());
 
 // Enable CORS for all routes
 app.use(cors({
@@ -44,8 +40,6 @@ app.use(express.json({ limit: '10kb' }));
 
 // Parse URL-encoded bodies
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-
-
 
 /**
  * LOGGING MIDDLEWARE (Development)

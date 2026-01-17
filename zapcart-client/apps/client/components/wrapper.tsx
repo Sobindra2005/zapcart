@@ -2,6 +2,7 @@ interface MainContainerProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
     spacing?: boolean;
     spacingClassName?: string;
+    className?: string;
 }
 
 // Consistent section spacing: py-12 (48px top/bottom) for all sections

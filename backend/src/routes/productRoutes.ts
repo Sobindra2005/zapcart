@@ -4,7 +4,6 @@ import {
     getAllProducts,
     getFeaturedProducts,
     getProductsByCategory,
-    searchProducts,
     getProductById,
     getRelatedProducts,
     updateProduct,
@@ -14,8 +13,6 @@ import {
     deleteProductVariant,
     bulkUpdateProducts,
     bulkDeleteProducts,
-    incrementProductViews,
-    updateProductRating,
 } from '@/controllers/product.controller';
 import { protect, restrictTo } from '@/middlewares/authMiddleware';
 
@@ -23,13 +20,10 @@ const router = Router();
 
 // Public routes (no authentication required)
 router.get('/featured', getFeaturedProducts);
-router.get('/search', searchProducts);
 router.get('/category/:categoryId', getProductsByCategory);
 router.get('/:identifier', getProductById);
 router.get('/:id/related', getRelatedProducts);
-router.post('/:id/view', incrementProductViews);
 
-// Protected routes (authentication required)
 router.use(protect);
 
 // Customer routes (authenticated users)
@@ -51,7 +45,5 @@ router.delete('/:id/variants/:sku', deleteProductVariant);
 router.patch('/bulk', bulkUpdateProducts);
 router.delete('/bulk', bulkDeleteProducts);
 
-// Rating (could be restricted to verified buyers)
-router.post('/:id/rating', updateProductRating);
 
 export default router;

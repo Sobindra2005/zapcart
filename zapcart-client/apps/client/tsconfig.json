@@ -30,6 +30,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "../../packages/ui/src/get-query-client.ts"  ],
   "exclude": ["node_modules"]
 }

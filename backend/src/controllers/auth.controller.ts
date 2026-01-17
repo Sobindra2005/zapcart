@@ -264,3 +264,73 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
         message: 'Logged out successfully',
     });
 });
+
+/**
+ * Update user profile (excluding password)
+ * PATCH /api/v1/auth/update-profile
+ */
+export const updateProfile = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id; 
+    if (!userId) {
+        throw new AppError('Unauthorized', 401);
+    }
+
+    const { email, firstName, lastName, phone, avatar } = req.body;
+
+    // Validate at least one field is provided
+    if (!email && !firstName && !lastName && !phone && !avatar) {
+        throw new AppError('Please provide at least one field to update', 400);
+    }
+
+    // If email is provided, validate format
+    if (email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            throw new AppError('Please provide a valid email address', 400);
+        }
+    }
+
+    // Build update data
+    const updateData: Record<string, any> = {};
+    if (email) updateData.email = email.toLowerCase();
+    if (firstName) updateData.firstName = firstName;
+    if (lastName) updateData.lastName = lastName;
+    if (phone !== undefined) updateData.phone = phone;
+    if (avatar !== undefined) updateData.avatar = avatar;
+
+    // If email is being updated, check for uniqueness
+    if (email) {
+        const existingUser = await prisma.user.findUnique({
+            where: { email: email.toLowerCase() },
+        });
+        if (existingUser && existingUser.id !== userId) {
+            throw new AppError('A user with this email already exists', 409);
+        }
+    }
+
+    // Update user
+    const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: updateData,
+        select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            avatar: true,
+            role: true,
+            status: true,
+            emailVerified: true,
+            createdAt: true,
+        },
+    });
+
+    res.status(200).json({
+        status: 'success',
+        message: 'Profile updated successfully',
+        data: {
+            user: updatedUser,
+        },
+    });
+});

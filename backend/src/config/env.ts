@@ -67,7 +67,7 @@ export const config = {
     jwtRefreshExpiration: getEnvVariable('JWT_REFRESH_EXPIRATION', '7d'),
 
     // Security configuration
-    rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
+    rateLimitWindowMs:  60 * 1000, // 15 minutes
     rateLimitMaxRequests: 100, // limit each IP to 100 requests per windowMs
 
     // Cloudinary configuration

@@ -1,10 +1,19 @@
-export type UserRole = 'ADMIN' | 'USER';
+export type UserRole = 'ADMIN' | 'CUSTOMER' | 'SUPERADMIN';
+
+export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'DELETED';
 
 export interface User {
-  id: string;
-  name: string;
+  id: string | number;
   email: string;
-  role: UserRole;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  role: 'ADMIN' | 'USER' | 'CUSTOMER';
+  status: UserStatus;
+  emailVerified: boolean;
+  lastLogin: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserState {

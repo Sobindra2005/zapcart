@@ -8,7 +8,7 @@ import asyncHandler from '@/utils/asyncHandler';
 /**
  * Extend Express Request interface to include user
  */
-/* eslint-disable @typescript-eslint/no-namespace */    
+/* eslint-disable @typescript-eslint/no-namespace */
 declare global {
     namespace Express {
         interface Request {
@@ -30,8 +30,8 @@ export const protect = asyncHandler(async (req: Request, _res: Response, next: N
     // 1. Get token from Authorization header
     let token: string | undefined;
 
-    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
-        token = req.headers.authorization.split(' ')[1];
+    if (req.cookies?.token) {
+        token = req.cookies.token;
     }
 
     if (!token) {
